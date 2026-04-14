@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Found Items - YIC Amanah</title>
+    <link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body>
+
+    <div class="dashboard-container">
+        <aside class="sidebar">
+            
+            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 5px;">
+                <img src="logo-placeholder.png" alt="Logo" width="30" height="30" style="border-radius: 5px; background-color: #eee;">
+                <h2 style="margin: 0;">YIC Amanah</h2>
+            </div>
+            
+            <p style="font-size: 0.8rem; color: #888; margin-bottom: 20px;">Campus Services</p>
+
+            <nav>
+                <a href="Student_dashboard.html">Dashboard</a>
+                <a href="report_item.html">Report Lost</a>
+                <a href="found_items.html" class="active">Found Items</a>
+                <a href="my_claims.html">My Claims</a>
+            </nav>
+
+            <div class="user-profile-menu" style="margin-top: auto; padding-top: 20px; border-top: 1px solid #eee;">
+                <p><strong>Student Name</strong></p>
+                <p style="font-size: 0.8rem;">Student, YIC</p>
+                
+                <div class="dropdown-content">
+                    <a href="auth.html" class="logout-btn">Logout</a>
+                </div>
+            </div>
+            
+        </aside>
+
+        <main class="main-content">
+            <header class="welcome-header">
+                <h1>Found Items</h1>
+                <p style="color: #888;">Browse items found on campus to identify yours.</p>
+            </header>
+
+            <div class="search-container">
+                <input type="text" class="search-bar" placeholder="Search by item name or location...">
+            </div>
+
+            <div class="items-grid">
+                <div class="item-card">
+                    <div>
+                        <h4>iPhone 13 Pro</h4>
+                        <p class="item-meta">Cafeteria - April 3</p>
+                    </div>
+                    <div class="card-actions">
+                        <a href="claim_form.html" class="btn-claim">Claim it</a>
+                        <a href="#" class="btn-claim">Details</a>
+                    </div>
+                </div>
+
+                <div class="item-card">
+                    <div>
+                        <h4>Blue bag</h4>
+                        <p class="item-meta">Building B - April 1</p>
+                    </div>
+                    <div class="card-actions">
+                        <a href="claim_form.html" class="btn-claim">Claim it</a>
+                        <a href="#" class="btn-claim">Details</a>
+                    </div>
+                </div>
+
+                <div class="item-card">
+                    <div>
+                        <h4>iPhone Case</h4>
+                        <p class="item-meta">Room 143 - February 15</p>
+                    </div>
+                    <div class="card-actions">
+                        <a href="claim_form.html" class="btn-claim">Claim it</a>
+                        <a href="#" class="btn-claim">Details</a>
+                    </div>
+                </div>
+
+                <div class="item-card">
+                    <div>
+                        <h4>Lenovo laptop</h4>
+                        <p class="item-meta">Building B - March 21</p>
+                    </div>
+                    <div class="card-actions">
+                        <a href="claim_form.html" class="btn-claim">Claim it</a>
+                        <a href="#" class="btn-claim">Details</a>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+</body>
+</html>

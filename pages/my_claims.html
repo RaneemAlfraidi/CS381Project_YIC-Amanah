@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Claims - YIC Amanah</title>
+    <link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body>
+
+    <div class="dashboard-container">
+        <aside class="sidebar">
+            
+            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 5px;">
+                <img src="logo-placeholder.png" alt="Logo" width="30" height="30" style="border-radius: 5px; background-color: #eee;">
+                <h2 style="margin: 0;">YIC Amanah</h2>
+            </div>
+            
+            <p style="font-size: 0.8rem; color: #888; margin-bottom: 20px;">Campus Services</p>
+
+            <nav>
+                <a href="Student_dashboard.html">Dashboard</a>
+                <a href="report_item.html">Report Lost</a>
+                <a href="found_items.html">Found Items</a>
+                <a href="my_claims.html" class="active">My Claims</a>
+            </nav>
+
+            <div class="user-profile-menu" style="margin-top: auto; padding-top: 20px; border-top: 1px solid #eee;">
+                <p><strong>Student Name</strong></p>
+                <p style="font-size: 0.8rem;">Student, YIC</p>
+                
+                <div class="dropdown-content">
+                    <a href="auth.html" class="logout-btn">Logout</a>
+                </div>
+            </div>
+            
+        </aside>
+
+        <main class="main-content">
+            <header class="welcome-header">
+                <h1>My Claims</h1>
+            </header>
+
+            <section class="stats-grid">
+                <div class="stat-card">
+                    <h3>Total Claims</h3>
+                    <p>2</p>
+                </div>
+                <div class="stat-card">
+                    <h3>Under review</h3>
+                    <p>1</p>
+                </div>
+                <div class="stat-card">
+                    <h3>Approved</h3>
+                    <p>1</p>
+                </div>
+            </section>
+
+            <h3>Recent Activity</h3>
+            <div style="margin-top: 20px;">
+
+                <div class="claim-item">
+                    <div class="claim-info">
+                        <span class="category-tag">Electronics</span>
+                        <h4>iPhone 13 Pro</h4>
+                        <p>Found at: Library, floor 2 | Claimed: April 5, 2026</p>
+                        <p>Posted by: student volunteer</p>
+                    </div>
+                    <div style="text-align: right;">
+                        <a href="#" style="font-size: 0.8rem; color: #5a32a8; display: block; margin-bottom: 10px;">View Details</a>
+                        <span class="status-badge status-under-review">Under Review</span>
+                    </div>
+                </div>
+
+                <div class="claim-item">
+                    <div class="claim-info">
+                        <span class="category-tag">clothing</span>
+                        <h4>Blue Bag</h4>
+                        <p>Found at: Building A, floor 1 | Claimed: April 2, 2026</p>
+                        <p>Posted by: student volunteer</p>
+                    </div>
+                    <div style="text-align: right;">
+                        <a href="#" style="font-size: 0.8rem; color: #5a32a8; display: block; margin-bottom: 10px;">View Details</a>
+                        <span class="status-badge status-approved">Approved</span>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+</body>
+</html>

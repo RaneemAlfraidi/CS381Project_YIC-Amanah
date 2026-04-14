@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Items - YIC Amanah</title>
+    <link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body>
+
+    <div class="dashboard-container">
+        <aside class="sidebar admin">
+            
+            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 5px;">
+                <img src="logo-placeholder.png" alt="Logo" width="30" height="30" style="border-radius: 5px; background-color: #eee;">
+                <h2 style="margin: 0;">YIC Amanah</h2>
+            </div>
+            
+            <p style="font-size: 0.8rem; color: #888; margin-bottom: 20px;">Admin Workspace</p>
+
+            <nav>
+                <a href="admin_dashboard.html">Dashboard</a>
+                <a href="manage_items.html" class="active">Manage Items</a>
+                <a href="manage_claims.html">Claims req.</a>
+            </nav>
+
+            <div class="user-profile-menu" style="margin-top: auto; padding-top: 20px; border-top: 1px solid #eee;">
+                <p><strong>Admin Name</strong></p>
+                <p style="font-size: 0.8rem;">Administrator, YIC</p>
+                
+                <div class="dropdown-content">
+                    <a href="auth.html" class="logout-btn">Logout</a>
+                </div>
+            </div>
+            
+        </aside>
+
+        <main class="main-content">
+            <header class="welcome-header">
+                <h1>Manage Found Items</h1>
+            </header>
+
+            <div class="form-container admin-form-container">
+                <h2 style="color: #27ae60;">Post a Found Item</h2>
+                <form action="../php/add_item.php" method="POST">
+                    <div class="form-group">
+                        <label for="item-name">Item Name</label>
+                        <input type="text" id="item-name" name="item_name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="date-found">Date Found</label>
+                        <input type="date" id="date-found" name="date_found" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="category">Category</label>
+                        <select id="category" name="category">
+                            <option value="electronics">Electronics</option>
+                            <option value="personal">Personal Items</option>
+                            <option value="books">Books</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="location">Location Found</label>
+                        <input type="text" id="location" name="location" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="description">Description</label>
+                        <textarea id="description" name="description" rows="3"></textarea>
+                    </div>
+                    <button type="submit" class="btn-admin-primary">Submit and save</button>
+                </form>
+            </div>
+
+           <section style="margin-top: 40px;">
+                <h3>Manage Found Items</h3>
+                <div class="search-container" style="margin-top: 10px;">
+                    <input type="text" class="search-bar" placeholder="Search Bar">
+                </div>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Item</th>
+                            <th>Location</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>iPhone 13 Pro</td>
+                            <td>Cafeteria</td>
+                            <td>-</td>
+                            <td>
+                                <a href="#" style="display: inline-block; padding: 5px 12px; background-color: #27ae60; color: white; text-decoration: none; border-radius: 4px; font-size: 0.8rem; margin-right: 5px;">Edit</a>
+                                <a href="#" style="display: inline-block; padding: 5px 12px; background-color: #e74c3c; color: white; text-decoration: none; border-radius: 4px; font-size: 0.8rem;">Delete</a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Blue bag</td>
+                            <td>Building B</td>
+                            <td>-</td>
+                            <td>
+                                <a href="#" style="display: inline-block; padding: 5px 12px; background-color: #27ae60; color: white; text-decoration: none; border-radius: 4px; font-size: 0.8rem; margin-right: 5px;">Edit</a>
+                                <a href="#" style="display: inline-block; padding: 5px 12px; background-color: #e74c3c; color: white; text-decoration: none; border-radius: 4px; font-size: 0.8rem;">Delete</a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+        </main>
+    </div>
+
+</body>
+</html>

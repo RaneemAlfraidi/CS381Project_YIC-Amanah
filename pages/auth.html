@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login / Sign Up - YIC Amanah</title>
+    <link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body>
+
+    <div class="auth-container" id="login-box">
+        <div class="auth-header">
+            <h2>Log in to YIC Amanah</h2>
+        </div>
+        <form action="../php/auth.php" method="POST">
+            <div class="form-group">
+                <label for="login-email">Email:</label>
+                <input type="email" id="login-email" name="email" required>
+            </div>
+            <div class="form-group">
+                <label for="login-password">Password:</label>
+                <input type="password" id="login-password" name="password" required>
+            </div>
+            <button type="submit" name="login">Log in</button>
+        </form>
+        <div class="switch-auth">
+            Don't have an account? <a href="#" onclick="toggleAuth()">Register here</a>
+        </div>
+    </div>
+
+    <div class="auth-container" id="signup-box" style="display: none;">
+        <div class="auth-header">
+            <h2>Create your account</h2>
+        </div>
+        <form action="../php/auth.php" method="POST">
+            <div class="form-group">
+                <label for="full-name">Full Name:</label>
+                <input type="text" id="full-name" name="full-name" required>
+            </div>
+            <div class="form-group">
+                <label for="reg-email">Email:</label>
+                <input type="email" id="reg-email" name="email" required>
+            </div>
+            <div class="form-group">
+                <label for="reg-password">Password:</label>
+                <input type="password" id="reg-password" name="password" required>
+            </div>
+            <div class="form-group">
+                <label for="confirm-password">Confirm Password:</label>
+                <input type="password" id="confirm-password" name="confirm_password" required>
+            </div>
+            <button type="submit" name="register">Sign up</button>
+        </form>
+        <div class="switch-auth">
+            Already have an account? <a href="#" onclick="toggleAuth()">Login here</a>
+        </div>
+    </div>
+
+    <script>
+        // Simple function to switch between Login and Sign up views
+        function toggleAuth() {
+            const loginBox = document.getElementById('login-box');
+            const signupBox = document.getElementById('signup-box');
+            if (loginBox.style.display === 'none') {
+                loginBox.style.display = 'block';
+                signupBox.style.display = 'none';
+            } else {
+                loginBox.style.display = 'none';
+                signupBox.style.display = 'block';
+            }
+        }
+    </script>
+</body>
+</html>

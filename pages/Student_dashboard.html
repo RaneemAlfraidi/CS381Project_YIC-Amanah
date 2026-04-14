@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Dashboard - YIC Amanah</title>
+    <link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body>
+
+    <div class="dashboard-container">
+        <aside class="sidebar">
+            
+            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 5px;">
+                <img src="logo-placeholder.png" alt="Logo" width="30" height="30" style="border-radius: 5px; background-color: #eee;">
+                <h2 style="margin: 0;">YIC Amanah</h2>
+            </div>
+            
+            <p style="font-size: 0.8rem; color: #888; margin-bottom: 20px;">Campus Services</p>
+
+            <nav>
+                <a href="Student_dashboard.html" class="active">Dashboard</a>
+                <a href="report_item.html">Report Lost</a>
+                <a href="found_items.html">Found Items</a>
+                <a href="my_claims.html">My Claims</a>
+            </nav>
+
+            <div class="user-profile-menu" style="margin-top: auto; padding-top: 20px; border-top: 1px solid #eee;">
+                <p><strong>Student Name</strong></p>
+                <p style="font-size: 0.8rem;">Student, YIC</p>
+                
+                <div class="dropdown-content">
+                    <a href="auth.html" class="logout-btn">Logout</a>
+                </div>
+            </div>
+            
+        </aside>
+
+        <main class="main-content">
+            <header class="welcome-header">
+                <h1>Welcome back, Name</h1>
+                <p style="color: #888;">Thursday, April 9 | YIC Campus</p>
+            </header>
+
+            <section class="stats-grid">
+                <div class="stat-card">
+                    <h3>Active Reports</h3>
+                    <p>2</p>
+                </div>
+                <div class="stat-card">
+                    <h3>Total Reunited</h3>
+                    <p>15</p>
+                </div>
+                <div class="stat-card">
+                    <h3>My Claims</h3>
+                    <p>1</p>
+                </div>
+                <div class="stat-card">
+                    <h3>Items Available</h3>
+                    <p>12</p>
+                </div>
+            </section>
+
+            <div class="action-buttons">
+                <a href="report_item.html" class="btn-secondary">Report Lost Items</a>
+                <a href="my_claims.html" class="btn-secondary">View My Claims</a>
+                <a href="found_items.html" class="btn-secondary">Browse Found Items</a>
+            </div>
+
+            <section>
+                <h3>Recently Found on Campus</h3>
+                <p style="color: #888; margin-top: 10px;">New items will appear here after admin approval.</p>
+            </section>
+
+        </main>
+    </div>
+
+</body>
+</html>

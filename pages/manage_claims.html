@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Claim Requests - YIC Amanah</title>
+    <link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body>
+
+    <div class="dashboard-container">
+        <aside class="sidebar admin">
+            
+            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 5px;">
+                <img src="logo-placeholder.png" alt="Logo" width="30" height="30" style="border-radius: 5px; background-color: #eee;">
+                <h2 style="margin: 0;">YIC Amanah</h2>
+            </div>
+            
+            <p style="font-size: 0.8rem; color: #888; margin-bottom: 20px;">Admin Workspace</p>
+
+            <nav>
+                <a href="admin_dashboard.html">Dashboard</a>
+                <a href="manage_items.html">Manage Items</a>
+                <a href="manage_claims.html" class="active">Claims req.</a>
+            </nav>
+
+            <div class="user-profile-menu" style="margin-top: auto; padding-top: 20px; border-top: 1px solid #eee;">
+                <p><strong>Admin Name</strong></p>
+                <p style="font-size: 0.8rem;">Administrator, YIC</p>
+                
+                <div class="dropdown-content">
+                    <a href="auth.html" class="logout-btn">Logout</a>
+                </div>
+            </div>
+            
+        </aside>
+
+        <main class="main-content">
+            <header class="welcome-header">
+                <h1>Claims Requests</h1>
+            </header>
+
+           <section>
+                <h3 style="color: #27ae60;">All Claims</h3>
+                <div class="search-container" style="margin-top: 10px;">
+                    <input type="text" class="search-bar" placeholder="Search Bar">
+                </div>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Student</th>
+                            <th>Item</th>
+                            <th>Date</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Sarah</td>
+                            <td>iPhone 13 Pro</td>
+                            <td>April 4</td>
+                            <td>Pending</td>
+                            <td>
+                                <a href="#" style="display: inline-block; padding: 5px 12px; background-color: #27ae60; color: white; text-decoration: none; border-radius: 4px; font-size: 0.8rem; font-weight: bold; margin-right: 5px;">Approve</a>
+                                <a href="#" style="display: inline-block; padding: 5px 12px; background-color: #e74c3c; color: white; text-decoration: none; border-radius: 4px; font-size: 0.8rem; font-weight: bold;">Reject</a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Raneem</td>
+                            <td>iPhone case</td>
+                            <td>March 5</td>
+                            <td>Approved</td>
+                            <td><span style="color: #888;">Done</span></td>
+                        </tr>
+                        <tr>
+                            <td>Amal</td>
+                            <td>Car keys</td>
+                            <td>Feb 15</td>
+                            <td>Rejected</td>
+                            <td><span style="color: #888;">Done</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+        </main>
+    </div>
+
+</body>
+</html>
