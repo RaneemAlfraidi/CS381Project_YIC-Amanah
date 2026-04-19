@@ -9,11 +9,10 @@
 <body>
 
     <div class="dashboard-container">
-        <aside class="sidebar">
+        <aside class="sidebar student">
             
             <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 5px;">
-                <img src="logo-placeholder.png" alt="Logo" width="30" height="30" style="border-radius: 5px; background-color: #eee;">
-                <h2 style="margin: 0;">YIC Amanah</h2>
+                <img src="../assets/media/logo.svg" alt="YIC Amanah Logo" width="200" height="150" >
             </div>
             
             <p style="font-size: 0.8rem; color: #888; margin-bottom: 20px;">Campus Services</p>
@@ -25,9 +24,14 @@
                 <a href="my_claims.html">My Claims</a>
             </nav>
 
-            <div class="user-profile-menu" style="margin-top: auto; padding-top: 20px; border-top: 1px solid #eee;">
-                <p><strong>Student Name</strong></p>
-                <p style="font-size: 0.8rem;">Student, YIC</p>
+             <div class="user-profile-menu" style="margin-top: auto; padding-top: 20px;">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <div class="user-avatar">RA</div>
+                    <div>
+                        <p style="color: #e0e0e0;"><strong>Raneem Alfraidi</strong></p>
+                        <p style="font-size: 0.8rem; color: #aaa;">Student, YIC</p>
+                    </div>
+                </div>
                 
                 <div class="dropdown-content">
                     <a href="auth.html" class="logout-btn">Logout</a>
@@ -62,9 +66,9 @@
             </section>
 
             <div class="action-buttons">
-                <a href="report_item.html" class="btn-secondary">Report Lost Items</a>
-                <a href="my_claims.html" class="btn-secondary">View My Claims</a>
-                <a href="found_items.html" class="btn-secondary">Browse Found Items</a>
+                <a href="report_item.html" class="btn-student">Report Lost Items</a>
+                <a href="my_claims.html" class="btn-student">View My Claims</a>
+                <a href="found_items.html" class="btn-student">Browse Found Items</a>
             </div>
 
             <section>

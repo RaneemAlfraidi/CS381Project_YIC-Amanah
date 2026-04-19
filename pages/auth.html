@@ -4,12 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login / Sign Up - YIC Amanah</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="../assets/css/style.css">
 </head>
 <body>
+    <a href="Index.html" class="return-home-icon"><i class="fas fa-home"></i></a>
 
     <div class="auth-container" id="login-box">
         <div class="auth-header">
+            <img src="../assets/media/logo.svg" alt="YIC Amanah Logo" width="200" height="150" >
             <h2>Log in to YIC Amanah</h2>
         </div>
         <form action="../php/auth.php" method="POST">
@@ -21,7 +24,9 @@
                 <label for="login-password">Password:</label>
                 <input type="password" id="login-password" name="password" required>
             </div>
-            <button type="submit" name="login">Log in</button>
+            <div class="center-btn-wrapper">
+            <button type="submit" class="btn-auth">Log in</button>
+            </div>
         </form>
         <div class="switch-auth">
             Don't have an account? <a href="#" onclick="toggleAuth()">Register here</a>
@@ -30,6 +35,7 @@
 
     <div class="auth-container" id="signup-box" style="display: none;">
         <div class="auth-header">
+            <img src="../assets/media/logo.svg" alt="YIC Amanah Logo" width="200" height="150" >
             <h2>Create your account</h2>
         </div>
         <form action="../php/auth.php" method="POST">
@@ -49,7 +55,9 @@
                 <label for="confirm-password">Confirm Password:</label>
                 <input type="password" id="confirm-password" name="confirm_password" required>
             </div>
-            <button type="submit" name="register">Sign up</button>
+            <div class="center-btn-wrapper">
+            <button type="submit" class="btn-auth">sign up</button>
+            </div>
         </form>
         <div class="switch-auth">
             Already have an account? <a href="#" onclick="toggleAuth()">Login here</a>
@@ -72,3 +80,5 @@
     </script>
 </body>
 </html>
+
+

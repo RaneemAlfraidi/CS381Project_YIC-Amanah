@@ -9,11 +9,10 @@
 <body>
 
     <div class="dashboard-container">
-        <aside class="sidebar">
-            
+        
+        <aside class="sidebar student">
             <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 5px;">
-                <img src="logo-placeholder.png" alt="Logo" width="30" height="30" style="border-radius: 5px; background-color: #eee;">
-                <h2 style="margin: 0;">YIC Amanah</h2>
+                <img src="../assets/media/logo.svg" alt="YIC Amanah Logo" width="200" height="150" >
             </div>
             
             <p style="font-size: 0.8rem; color: #888; margin-bottom: 20px;">Campus Services</p>
@@ -25,24 +24,29 @@
                 <a href="my_claims.html">My Claims</a>
             </nav>
 
-            <div class="user-profile-menu" style="margin-top: auto; padding-top: 20px; border-top: 1px solid #eee;">
-                <p><strong>Student Name</strong></p>
-                <p style="font-size: 0.8rem;">Student, YIC</p>
+            <div class="user-profile-menu" style="margin-top: auto; padding-top: 20px;">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <div class="user-avatar">RA</div>
+                    <div>
+                        <p style="color: #e0e0e0;"><strong>Raneem Alfraidi</strong></p>
+                        <p style="font-size: 0.8rem; color: #aaa;">Student, YIC</p>
+                    </div>
+                </div>
                 
                 <div class="dropdown-content">
-                    <a href="auth.html" class="logout-btn">Logout</a>
+                    <a href="auth.html" class="logout-btn" style="border-top: none;">Logout</a>
                 </div>
             </div>
-            
         </aside>
 
         <main class="main-content">
             <header class="welcome-header">
                 <h1>Report Lost Items</h1>
+                    <p style="color: #888;">Submit a report for something you lost, track its status below.</p>
+
             </header>
 
             <div class="form-container">
-                <h2>Report a Lost Item</h2>
                 <form action="../php/report_item.php" method="POST">
                     <div class="form-group">
                         <label for="item-name">Item Name</label>
@@ -71,14 +75,14 @@
                     </div>
 
                     <div style="display: flex; gap: 10px;">
-                        <button type="submit" style="flex: 2;">Submit Report</button>
-                        <button type="reset" style="flex: 1; background-color: #ccc;">Cancel</button>
+                        <button type="submit" class="btn-student">Submit Report</button>
+                        <button type="reset" style="flex: 1; background-color: #ccc; color: #333;">Cancel</button>
                     </div>
                 </form>
             </div>
 
-          <section style="margin-top: 40px;">
-                <h3>My Past Reports</h3>
+            <section style="margin-top: 40px;">
+                <h3 style="color: #e0e0e0;">My Past Reports</h3>
                 <table class="data-table">
                     <thead>
                         <tr>
@@ -94,18 +98,18 @@
                             <td>iPhone 13 Pro</td>
                             <td>April 3</td>
                             <td>Cafeteria</td>
-                            <td><span class="status-badge">Pending</span></td>
+                            <td><span class="status-badge status-under-review">Pending</span></td>
                             <td>
-                                <a href="#" style="display: inline-block; padding: 5px 12px; background-color: #5a32a8; color: white; text-decoration: none; border-radius: 4px; font-size: 0.8rem;">View</a>
+                                <a href="#" class="status-badge status-purple">View</a>
                             </td>
                         </tr>
                         <tr>
                             <td>Blue bag</td>
                             <td>March 21</td>
                             <td>Building B</td>
-                            <td><span class="status-badge">Found</span></td>
+                            <td><span class="status-badge status-approved">Found</span></td>
                             <td>
-                                <a href="#" style="display: inline-block; padding: 5px 12px; background-color: #5a32a8; color: white; text-decoration: none; border-radius: 4px; font-size: 0.8rem;">View</a>
+                                <a href="#" class="status-badge status-purple">View</a>
                             </td>
                         </tr>
                     </tbody>
