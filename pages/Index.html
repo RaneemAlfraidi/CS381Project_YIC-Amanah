@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YIC Amanah - Lost & Found</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <style>
+        /* Force absolute full-screen with no scrolling */
+        html, body {
+            height: 100vh;
+            margin: 0;
+            padding: 0;
+            overflow: hidden; 
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #121212;
+        }
+
+        .home-hero {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-evenly; /* Evenly distributes space vertically */
+            width: 100%;
+            height: 90vh; /* Keeps content slightly away from very edges */
+            text-align: center;
+            padding: 0 20px;
+        }
+
+        .hero-logo img {
+            width: 180px; /* Scaled down from 220px to save space */
+            height: auto;
+            filter: drop-shadow(0 0 15px rgba(162, 129, 232, 0.15));
+        }
+
+        .hero-text {
+            max-width: 650px;
+        }
+
+        .hero-text h1 {
+            font-size: 2.4rem; /* More compact size */
+            line-height: 1.2;
+            margin-bottom: 0.8rem;
+            background: linear-gradient(135deg, #a281e8 0%, #4fd1c5 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero-text p {
+            color: #888;
+            font-size: 1rem;
+            margin: 0;
+        }
+
+        .role-selection {
+            display: flex;
+            gap: 24px;
+            width: 100%;
+            max-width: 850px;
+            justify-content: center;
+        }
+
+        .role-card {
+            flex: 1;
+            background: rgba(30, 30, 30, 0.6);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 25px 20px; /* Reduced padding to fit better */
+            border-radius: 24px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .role-card:hover {
+            transform: translateY(-5px);
+            background: rgba(35, 35, 35, 0.9);
+            border-color: rgba(162, 129, 232, 0.4);
+        }
+
+        .icon-circle {
+            width: 55px; /* Scaled down icons */
+            height: 55px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 15px;
+            font-size: 1.4rem;
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .student-icon { color: #a281e8; border: 1px solid rgba(162, 129, 232, 0.2); }
+        .admin-icon { color: #4fd1c5; border: 1px solid rgba(79, 209, 197, 0.2); }
+
+        .role-card h3 {
+            font-size: 1.2rem;
+            margin-bottom: 8px;
+            color: #fff;
+        }
+
+        .role-card p {
+            font-size: 0.85rem;
+            color: #666;
+            line-height: 1.4;
+        }
+
+        .home-footer {
+            margin-top: 10px;
+            font-size: 0.7rem;
+            color: #333;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+        }
+    </style>
+</head>
+<body>
+
+    <main class="home-hero">
+        <div class="hero-logo">
+            <img src="../assets/media/logo.svg" alt="YIC Amanah Logo">
+        </div>
+
+        <div class="hero-text">
+            <h1>Found on Campus<br>Returned with Amanah!</h1>
+            <p>Amanah: Your campus recovery partner. <br>The official YIC Lost and Found portal.</p>
+        </div>
+
+        <div class="role-selection">
+            <a href="auth.html" class="role-card">
+                <div class="icon-circle student-icon">
+                    <i class="fas fa-user-graduate"></i>
+                </div>
+                <h3>Student Portal</h3>
+                <p>Report lost items, browse the collection, and manage claims.</p>
+            </a>
+
+            <a href="auth.html" class="role-card">
+                <div class="icon-circle admin-icon">
+                    <i class="fas fa-user-shield"></i>
+                </div>
+                <h3>Admin Workspace</h3>
+                <p>Register items, verify ownership, and manage campus records.</p>
+            </a>
+        </div>
+
+        <footer class="home-footer">
+            &copy; 2026 YIC Amanah | Campus Security Services
+        </footer>
+    </main>
+
+</body>
+</html>
