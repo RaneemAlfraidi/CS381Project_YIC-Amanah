@@ -4,25 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard - YIC Amanah</title>
-<link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="../assets/css/style.css">
 </head>
 <body>
-
     <div class="dashboard-container">
         <aside class="sidebar admin">
-            
             <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 5px;">
-                <img src="../assets/media/logo.svg" alt="YIC Amanah Logo" width="200" height="150" >
+                <img src="../assets/media/logo.svg" alt="YIC Amanah Logo" width="200" height="150">
             </div>
-            
             <p style="font-size: 0.8rem; color: #888; margin-bottom: 20px;">Admin Workspace</p>
-
             <nav>
                 <a href="admin_dashboard.html" class="active">Dashboard</a>
                 <a href="manage_items.html">Manage Items</a>
                 <a href="manage_claims.html">Claims requests</a>
             </nav>
-
             <div class="user-profile-menu" style="margin-top: auto; padding-top: 20px;">
                 <div style="display: flex; align-items: center; gap: 12px;">
                     <div class="user-avatar">KM</div>
@@ -31,12 +26,10 @@
                         <p style="font-size: 0.8rem; color: #aaa;">Administrator, YIC</p>
                     </div>
                 </div>
-                
                 <div class="dropdown-content">
                     <a href="auth.html" class="logout-btn">Logout</a>
                 </div>
             </div>
-            
         </aside>
 
         <main class="main-content">
@@ -44,60 +37,42 @@
                 <h1>Welcome back, Admin</h1>
                 <p style="color: #888;">Thursday, April 9 | YIC Campus</p>
             </header>
-
             <section class="stats-grid">
-                <div class="stat-card">
-                    <h3>Delivered items</h3>
-                    <p>45</p>
-                </div>
-                <div class="stat-card">
-                    <h3>Total Found</h3>
-                    <p>12</p>
-                </div>
-                <div class="stat-card">
-                    <h3>Pending Claims</h3>
-                    <p>3</p>
-                </div>
+                <div class="stat-card"><h3>Delivered items</h3><p>45</p></div>
+                <div class="stat-card"><h3>Total Found</h3><p>12</p></div>
+                <div class="stat-card"><h3>Pending Claims</h3><p>3</p></div>
             </section>
-
             <div class="action-buttons">
                 <a href="manage_items.html" class="btn-admin-primary">Post Found Items</a>
                 <a href="manage_claims.html" class="btn-admin-primary">Review Claims</a>
             </div>
-
             <section style="margin-top: 30px;">
                 <h3>Recent Pending Claims</h3>
                 <table class="data-table admin-table">
                     <thead>
-                        <tr>
-                            <th>Student</th>
-                            <th>Item</th>
-                            <th>Date</th>
-                            <th>Action</th>
-                        </tr>
+                        <tr><th>Student</th><th>Item</th><th>Date</th><th>Action</th></tr>
                     </thead>
                     <tbody>
                         <tr>
-                            <td>Sarah</td>
-                            <td>iPhone 13 Pro</td>
-                            <td>April 4</td>
-                            <td>
-                              <div class="admin-actions">
-                                 <a href="#" class="status-badge status-green">Approve</a>
-                                 <a href="#" class="status-badge status-red">Reject</a>
-                              </div>
+                            <td data-label="Student">Sarah</td>
+                            <td data-label="Item">iPhone 13 Pro</td>
+                            <td data-label="Date">April 4</td>
+                            <td data-label="Action">
+                                <div class="admin-actions">
+                                    <a href="#" class="status-badge status-green">Approve</a>
+                                    <a href="#" class="status-badge status-red">Reject</a>
+                                </div>
                             </td>
-                            
                         </tr>
                         <tr>
-                            <td>Norah</td>
-                            <td>Blue bag</td>
-                            <td>April 3</td>
-                            <td>
-                              <div class="admin-actions">
-                                 <a href="#" class="status-badge status-green">Approve</a>
-                                 <a href="#" class="status-badge status-red">Reject</a>
-                              </div>
+                            <td data-label="Student">Norah</td>
+                            <td data-label="Item">Blue bag</td>
+                            <td data-label="Date">April 3</td>
+                            <td data-label="Action">
+                                <div class="admin-actions">
+                                    <a href="#" class="status-badge status-green">Approve</a>
+                                    <a href="#" class="status-badge status-red">Reject</a>
+                                </div>
                             </td>
                         </tr>
                     </tbody>
@@ -105,6 +80,6 @@
             </section>
         </main>
     </div>
-<script src="../assets/javascript/script.js"></script>
+    <script src="../assets/javascript/script.js"></script>
 </body>
 </html>

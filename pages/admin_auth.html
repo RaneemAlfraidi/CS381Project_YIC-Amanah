@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login - YIC Amanah</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body>
+    <a href="Index.html" class="return-home-icon"><i class="fas fa-home"></i></a>
+
+    <div class="auth-container">
+        <div class="auth-header">
+            <img src="../assets/media/logo.svg" alt="YIC Amanah Logo" width="200" height="150">
+            <h2>Admin Log in</h2>
+            <p style="font-size: 0.85rem; color: #aaa;">Use your official admin credentials</p>
+        </div>
+        <form id="admin-login-form">
+            <div class="form-group">
+                <label for="admin-email">Email:</label>
+                <input type="email" id="admin-email" required>
+            </div>
+            <div class="form-group">
+                <label for="admin-password">Password:</label>
+                <input type="password" id="admin-password" required>
+            </div>
+            <div class="center-btn-wrapper">
+                <button type="submit" class="btn-auth">Log in as Admin</button>
+            </div>
+        </form>
+        <div class="switch-auth" style="margin-top: 20px;">
+            <a href="Index.html">← Back to Home</a>
+        </div>
+    </div>
+
+    <script src="../assets/javascript/script.js"></script>
+</body>
+</html>
