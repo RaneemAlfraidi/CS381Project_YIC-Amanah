@@ -4,25 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Claim Requests - YIC Amanah</title>
-<link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="../assets/css/style.css">
 </head>
 <body>
-
     <div class="dashboard-container">
         <aside class="sidebar admin">
-            
             <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 5px;">
-                <img src="../assets/media/logo.svg" alt="YIC Amanah Logo" width="200" height="150" >
+                <img src="../assets/media/logo.svg" alt="YIC Amanah Logo" width="200" height="150">
             </div>
-            
             <p style="font-size: 0.8rem; color: #888; margin-bottom: 20px;">Admin Workspace</p>
-
             <nav>
                 <a href="admin_dashboard.html">Dashboard</a>
                 <a href="manage_items.html">Manage Items</a>
                 <a href="manage_claims.html" class="active">Claims requests</a>
             </nav>
-
             <div class="user-profile-menu" style="margin-top: auto; padding-top: 20px;">
                 <div style="display: flex; align-items: center; gap: 12px;">
                     <div class="user-avatar">KM</div>
@@ -31,22 +26,18 @@
                         <p style="font-size: 0.8rem; color: #aaa;">Administrator, YIC</p>
                     </div>
                 </div>
-                
                 <div class="dropdown-content">
                     <a href="auth.html" class="logout-btn">Logout</a>
                 </div>
             </div>
-            
         </aside>
 
         <main class="main-content">
             <header class="welcome-header">
                 <h1>Claims Requests</h1>
-                 <p style="color: #888;">Review and manage item claims submitted by students.</p>
-
+                <p style="color: #888;">Review and manage item claims submitted by students.</p>
             </header>
-
-           <section>
+            <section>
                 <h3>All Claims</h3>
                 <div class="search-container" style="margin-top: 10px;">
                     <input type="text" class="search-bar" placeholder="Search Bar">
@@ -54,44 +45,39 @@
                 <table class="data-table admin-table">
                     <thead>
                         <tr>
-                            <th>Student</th>
-                            <th>Item</th>
-                            <th>Date</th>
-                            <th>Status</th>
-                            <th>Action</th>
+                            <th>Student</th><th>Item</th><th>Date</th><th>Status</th><th>Action</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
-                            <td>Sarah</td>
-                            <td>iPhone 13 Pro</td>
-                            <td>April 4</td>
-                            <td>Pending</td>
-                            <td>
-                             <a href="#" class="status-badge status-green">Approve</a>
-                             <a href="#" class="status-badge status-red">Reject</a>
+                            <td data-label="Student">Sarah</td>
+                            <td data-label="Item">iPhone 13 Pro</td>
+                            <td data-label="Date">April 4</td>
+                            <td data-label="Status">Pending</td>
+                            <td data-label="Action">
+                                <a href="#" class="status-badge status-green">Approve</a>
+                                <a href="#" class="status-badge status-red">Reject</a>
                             </td>
-                            
                         </tr>
                         <tr>
-                            <td>Raneem</td>
-                            <td>iPhone case</td>
-                            <td>March 5</td>
-                            <td>Approved</td>
-                            <td><span style="color: #888;">Done</span></td>
+                            <td data-label="Student">Raneem</td>
+                            <td data-label="Item">iPhone case</td>
+                            <td data-label="Date">March 5</td>
+                            <td data-label="Status">Approved</td>
+                            <td data-label="Action"><span style="color: #888;">Done</span></td>
                         </tr>
                         <tr>
-                            <td>Amal</td>
-                            <td>Car keys</td>
-                            <td>Feb 15</td>
-                            <td>Rejected</td>
-                            <td><span style="color: #888;">Done</span></td>
+                            <td data-label="Student">Amal</td>
+                            <td data-label="Item">Car keys</td>
+                            <td data-label="Date">Feb 15</td>
+                            <td data-label="Status">Rejected</td>
+                            <td data-label="Action"><span style="color: #888;">Done</span></td>
                         </tr>
                     </tbody>
                 </table>
             </section>
         </main>
     </div>
-<script src="../assets/javascript/script.js"></script>
+    <script src="../assets/javascript/script.js"></script>
 </body>
 </html>

@@ -1,132 +1,117 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manage Items - YIC Amanah</title>
-<link rel="stylesheet" href="../assets/css/style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Manage Items - YIC Amanah</title>
+  <link rel="stylesheet" href="../assets/css/style.css" />
 </head>
 <body>
+  <div class="dashboard-container">
+    <aside class="sidebar admin">
+      <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 5px;">
+        <img src="../assets/media/logo.svg" alt="YIC Amanah Logo" width="200" height="150" />
+      </div>
+      <p style="font-size: 0.8rem; color: #888; margin-bottom: 20px;">Admin Workspace</p>
+      <nav>
+        <a href="admin_dashboard.html">Dashboard</a>
+        <a href="manage_items.html" class="active">Manage Items</a>
+        <a href="manage_claims.html">Claims Requests</a>
+      </nav>
+      <div class="user-profile-menu" style="margin-top: auto; padding-top: 20px;">
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <div class="user-avatar">KM</div>
+          <div>
+            <p style="color: #e0e0e0;"><strong>Khadijah Mahrous</strong></p>
+            <p style="font-size: 0.8rem; color: #aaa;">Administrator, YIC</p>
+          </div>
+        </div>
+        <div class="dropdown-content">
+          <a href="#" class="logout-btn">Logout</a>
+        </div>
+      </div>
+    </aside>
 
-    <div class="dashboard-container">
-        <aside class="sidebar admin">
-            
-            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 5px;">
-                 <img src="../assets/media/logo.svg" alt="YIC Amanah Logo" width="200" height="150" >
-            </div>
-            
-            <p style="font-size: 0.8rem; color: #888; margin-bottom: 20px;">Admin Workspace</p>
+    <main class="main-content">
+      <header class="welcome-header">
+        <h1>Post Found Items</h1>
+        <p style="color: #888;">Register newly found items and manage the existing records below.</p>
+      </header>
 
-            <nav>
-                <a href="admin_dashboard.html">Dashboard</a>
-                <a href="manage_items.html" class="active">Manage Items</a>
-                <a href="manage_claims.html">Claims requests</a>
-            </nav>
-            
-            <div class="user-profile-menu" style="margin-top: auto; padding-top: 20px;">
-                <div style="display: flex; align-items: center; gap: 12px;">
-                    <div class="user-avatar">KM</div>
-                    <div>
-                        <p style="color: #e0e0e0;"><strong>Khadijah Mahrous</strong></p>
-                        <p style="font-size: 0.8rem; color: #aaa;">Administrator, YIC</p>
-                    </div>
+      <div class="form-container admin-form-container">
+        <form id="add-item-form">
+          <div class="form-group">
+            <label for="item-name">Item Name</label>
+            <input type="text" id="item-name" name="item_name" placeholder="e.g. iPhone 13 Pro" required />
+          </div>
+          <div class="form-group">
+            <label for="date-found">Date Found</label>
+            <input type="date" id="date-found" name="date_found" required />
+          </div>
+          <div class="form-group">
+            <label for="category">Category</label>
+            <select id="category" name="category">
+              <option value="electronics">Electronics</option>
+              <option value="personal">Personal Items</option>
+              <option value="books">Books</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="location">Location Found</label>
+            <input type="text" id="location" name="location" placeholder="e.g. Library, Floor 2" required />
+          </div>
+          <div class="form-group">
+            <label for="description">Description</label>
+            <textarea id="description" name="description" rows="4" placeholder="Describe colors, marks, or specific details..."></textarea>
+          </div>
+          <div class="action-buttons">
+            <button type="submit" class="btn-admin-primary">Submit</button>
+            <button type="reset" class="btn-cancel">Cancel</button>
+          </div>
+        </form>
+      </div>
+
+      <section style="margin-top: 40px;">
+        <h3>Manage Found Items</h3>
+        <div class="search-container" style="margin-top: 10px;">
+          <input type="text" class="search-bar admin-search-bar" placeholder="Search items..." />
+        </div>
+        <table class="data-table admin-table">
+          <thead>
+            <tr><th>Item</th><th>Location</th><th>Status</th><th>Action</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td data-label="Item">iPhone 13 Pro</td>
+              <td data-label="Location">Cafeteria</td>
+              <td data-label="Status">-</td>
+              <td data-label="Action">
+                <div class="admin-actions">
+                  <a href="#" class="status-badge status-green">Edit</a>
+                  <a href="#" class="status-badge status-red">Delete</a>
                 </div>
-                
-                <div class="dropdown-content">
-                    <a href="auth.html" class="logout-btn">Logout</a>
+              </td>
+            </tr>
+            <tr>
+              <td data-label="Item">Blue Bag</td>
+              <td data-label="Location">Building B</td>
+              <td data-label="Status">-</td>
+              <td data-label="Action">
+                <div class="admin-actions">
+                  <a href="#" class="status-badge status-green">Edit</a>
+                  <a href="#" class="status-badge status-red">Delete</a>
                 </div>
-            </div>
-            
-        </aside>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+    </main>
+  </div>
 
-        <main class="main-content">
-            <header class="welcome-header">
-                <h1>Post Found Items</h1>
-                <p style="color: #888;">Register newly found items and manage the existing records below.</p>
-
-            </header>
-
-            <div class="form-container admin-form-container">
-                <form action="../php/add_item.php" method="POST">
-                    <div class="form-group">
-                        <label for="item-name">Item Name</label>
-                        <input type="text" id="item-name" name="item_name" placeholder="e.g. iPhone 13 Pro" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="date-found">Date Found</label>
-                        <input type="date" id="date-found" name="date_found" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="category">Category</label>
-                        <select id="category" name="category">
-                            <option value="electronics">Electronics</option>
-                            <option value="personal">Personal Items</option>
-                            <option value="books">Books</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="location">Location Found</label>
-                        <input type="text" id="location" name="location" placeholder="e.g. Library, Floor 2" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="description">Description</label>
-                        <textarea id="description" name="description" rows="4" placeholder="Describe colors, marks, or specific details..."></textarea>
-                    </div>
-
-                     <div style="display: flex; gap: 10px;">
-                          <button type="submit" class="btn-admin-primary">Submit</button>
-                          <button type="reset" style="flex: 1; background-color: #ccc; color: #333;">Cancel</button>
-                    </div>
-
-                </form>
-            </div>
-
-           <section style="margin-top: 40px;">
-                <h3>Manage Found Items</h3>
-                <div class="search-container" style="margin-top: 10px;">
-                    <input type="text" class="search-bar" placeholder="Search Bar">
-                </div>
-                <table class="data-table admin-table">
-                    <thead>
-                        <tr>
-                            <th>Item</th>
-                            <th>Location</th>
-                            <th>Status</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>iPhone 13 Pro</td>
-                            <td>Cafeteria</td>
-                            <td>-</td>
-                            <td>
-                             <div>
-                                 <a href="#" class="status-badge status-green">Edit</a>
-        
-                                 <a href="#" class="status-badge status-red">Delete</a>
-                             </div>
-                            </td>
-                            
-                        </tr>
-                        <tr>
-                            <td>Blue bag</td>
-                            <td>Building B</td>
-                            <td>-</td>
-                             <td>
-                             <div>
-                                 <a href="#" class="status-badge status-green">Edit</a>
-        
-                                 <a href="#" class="status-badge status-red">Delete</a>
-                             </div>
-                            </td>
-                           
-                        </tr>
-                    </tbody>
-                </table>
-            </section>
-        </main>
-    </div>
-<script src="../assets/javascript/script.js"></script>
+  <div id="custom-alert" class="alert-box" style="display:none;">
+    <div class="alert-content"><p id="alert-message"></p><button id="alert-ok">OK</button></div>
+  </div>
+  <script src="../assets/javascript/script.js"></script>
 </body>
 </html>

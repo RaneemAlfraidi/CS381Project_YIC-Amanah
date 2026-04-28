@@ -416,6 +416,38 @@ button:hover, .btn-admin-primary:hover {
   .auth-page {
     padding: 72px 16px 16px;
   }
+
+  /* Mobile: tables become vertical cards */
+@media (max-width: 768px) {
+  .data-table, .data-table thead, .data-table tbody, .data-table th, .data-table td, .data-table tr {
+    display: block;
+  }
+  .data-table thead { display: none; }
+  .data-table tr {
+    margin-bottom: 20px;
+    border: 1px solid var(--border-main);
+    border-radius: 16px;
+    padding: 12px;
+    background: var(--bg-panel);
+  }
+  .data-table td {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 12px;
+    border-bottom: 1px dashed var(--border-main);
+    text-align: right;
+    gap: 10px;
+  }
+  .data-table td:last-child { border-bottom: none; }
+  .data-table td::before {
+    content: attr(data-label);
+    font-weight: bold;
+    color: var(--purple);
+    text-align: left;
+    flex: 1;
+  }
+}
   .auth-page .auth-container { width: min(100%, 400px); }
   .data-table { width: 100%; table-layout: fixed; }
   .data-table th, .data-table td {     /* Make table content smaller for phones */

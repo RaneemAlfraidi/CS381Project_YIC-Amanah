@@ -1,100 +1,78 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Claims - YIC Amanah</title>
-<link rel="stylesheet" href="../assets/css/style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Claims - YIC Amanah</title>
+  <link rel="stylesheet" href="../assets/css/style.css" />
 </head>
 <body>
+  <div class="dashboard-container">
+    <aside class="sidebar student">
+      <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 5px;">
+        <img src="../assets/media/logo.svg" alt="YIC Amanah Logo" width="200" height="150" />
+      </div>
+      <p style="font-size: 0.8rem; color: #888; margin-bottom: 20px;">Campus Services</p>
+      <nav>
+        <a href="Student_dashboard.html">Dashboard</a>
+        <a href="report_item.html">Report Lost</a>
+        <a href="found_items.html">Found Items</a>
+        <a href="my_claims.html" class="active">My Claims</a>
+      </nav>
+      <div class="user-profile-menu" style="margin-top: auto; padding-top: 20px;">
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <div class="user-avatar">RA</div>
+          <div>
+            <p style="color: #e0e0e0;"><strong>Raneem Alfraidi</strong></p>
+            <p style="font-size: 0.8rem; color: #aaa;">Student, YIC</p>
+          </div>
+        </div>
+        <div class="dropdown-content">
+          <a href="#" class="logout-btn">Logout</a>
+        </div>
+      </div>
+    </aside>
 
-    <div class="dashboard-container">
-        <aside class="sidebar student">
-            
-            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 5px;">
-                <img src="../assets/media/logo.svg" alt="YIC Amanah Logo" width="200" height="150" >
+    <main class="main-content">
+      <header class="welcome-header">
+        <h1>My Claim Requests</h1>
+        <p style="color: #888;">Track the status of items you have claimed.</p>
+      </header>
 
-            </div>
-            
-            <p style="font-size: 0.8rem; color: #888; margin-bottom: 20px;">Campus Services</p>
+      <section>
+        <h3>Your Claims</h3>
+        <table class="data-table">
+          <thead>
+            <tr><th>Item</th><th>Date Claimed</th><th>Status</th><th>Details</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td data-label="Item">iPhone 13 Pro</td>
+              <td data-label="Date Claimed">April 4, 2026</td>
+              <td data-label="Status"><span class="status-badge status-under-review">Pending Review</span></td>
+              <td data-label="Details"><a href="#" class="status-badge status-purple">View</a></td>
+            </tr>
+            <tr>
+              <td data-label="Item">Blue Backpack</td>
+              <td data-label="Date Claimed">March 22, 2026</td>
+              <td data-label="Status"><span class="status-badge status-approved">Approved</span></td>
+              <td data-label="Details"><a href="#" class="status-badge status-purple">View</a></td>
+            </tr>
+            <tr>
+              <td data-label="Item">Car Keys</td>
+              <td data-label="Date Claimed">Feb 18, 2026</td>
+              <td data-label="Status"><span class="status-badge status-red">Rejected</span></td>
+              <td data-label="Details"><a href="#" class="status-badge status-purple">View</a></td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+    </main>
+  </div>
 
-            <nav>
-                <a href="Student_dashboard.html">Dashboard</a>
-                <a href="report_item.html">Report Lost</a>
-                <a href="found_items.html">Found Items</a>
-                <a href="my_claims.html" class="active">My Claims</a>
-            </nav>
-
-             <div class="user-profile-menu" style="margin-top: auto; padding-top: 20px;">
-                <div style="display: flex; align-items: center; gap: 12px;">
-                    <div class="user-avatar">RA</div>
-                    <div>
-                        <p style="color: #e0e0e0;"><strong>Raneem Alfraidi</strong></p>
-                        <p style="font-size: 0.8rem; color: #aaa;">Student, YIC</p>
-                    </div>
-                </div>
-                
-                <div class="dropdown-content">
-                    <a href="auth.html" class="logout-btn">Logout</a>
-                </div>
-            </div>
-            
-        </aside>
-
-        <main class="main-content">
-            <header class="welcome-header">
-                <h1>My Claims</h1>
-                <p style="color: #888;">Track every item you have claimed and veiw its current status.</p>
-
-            </header>
-
-            <section class="stats-grid">
-                <div class="stat-card">
-                    <h3>Total Claims</h3>
-                    <p>2</p>
-                </div>
-                <div class="stat-card">
-                    <h3>Under review</h3>
-                    <p>1</p>
-                </div>
-                <div class="stat-card">
-                    <h3>Approved</h3>
-                    <p>1</p>
-                </div>
-            </section>
-
-            <h3>Recent Activity</h3>
-            <div style="margin-top: 20px;">
-
-                <div class="claim-item">
-                    <div class="claim-info">
-                        <span class="category-tag">Electronics</span>
-                        <h4>iPhone 13 Pro</h4>
-                        <p>Found at: Library, floor 2 | Claimed: April 5, 2026</p>
-                        <p>Posted by: student volunteer</p>
-                    </div>
-                    <div style="text-align: right;">
-                        <a href="#" class="status-badge status-purple">View Details</a>
-                        <span class="status-badge status-under-review">Under Review</span>
-                    </div>
-                </div>
-
-                <div class="claim-item">
-                    <div class="claim-info">
-                        <span class="category-tag">clothing</span>
-                        <h4>Blue Bag</h4>
-                        <p>Found at: Building A, floor 1 | Claimed: April 2, 2026</p>
-                        <p>Posted by: student volunteer</p>
-                    </div>
-                    <div style="text-align: right;">
-                        <a href="#" class="status-badge status-purple">View Details</a>
-                        <span class="status-badge status-approved">Approved</span>
-                    </div>
-                </div>
-
-            </div>
-        </main>
-    </div>
-<script src="../assets/javascript/script.js"></script>
+  <div id="custom-alert" class="alert-box" style="display:none;">
+    <div class="alert-content"><p id="alert-message"></p><button id="alert-ok">OK</button></div>
+  </div>
+  <script src="../assets/javascript/script.js"></script>
 </body>
 </html>
