@@ -337,8 +337,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // 7. ADMIN ACTIONS (Approve/Reject)
     // ========================================
     
-    document.querySelectorAll('.status-green, .btn-approve').forEach(btn => {
-        if (btn.textContent.includes('Approve') || btn.classList.contains('status-green')) {
+    document.querySelectorAll('.status-green').forEach(btn => {
+        if (btn.textContent.includes('Approve')) {
             btn.addEventListener('click', (e) => {
                 e.preventDefault();
                 if (confirm('Approve this claim?')) {
@@ -355,8 +355,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
     
-    document.querySelectorAll('.status-red, .btn-reject').forEach(btn => {
-        if (btn.textContent.includes('Reject') || btn.classList.contains('status-red')) {
+    document.querySelectorAll('.status-red').forEach(btn => {
+        if (btn.textContent.includes('Reject')) {
             btn.addEventListener('click', (e) => {
                 e.preventDefault();
                 if (confirm('Reject this claim?')) {
