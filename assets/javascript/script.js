@@ -1,9 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
     console.log("YIC Amanah Script Loaded");
 
-    // ========================================
     // CUSTOM ALERT & CONFIRM (same as before)
-    // ========================================
     function showAlert(message, callback) {
         let box = document.getElementById('custom-alert');
         if (!box) {
@@ -49,9 +47,7 @@ document.addEventListener('DOMContentLoaded', () => {
         newNo.onclick = () => { box.style.display = 'none'; if (onNo) onNo(); };
     }
 
-    // ========================================
     // ADMIN CREDENTIALS (hardcoded)
-    // ========================================
     const ADMIN_CREDENTIALS = [
         { email: "y4f441500093@rcjy.edu.sa", password: "admin123", name: "Khadijah Mahrous" },
         { email: "y4f441500506@rcjy.edu.sa", password: "admin123", name: "Raneem Alfraidi" }
@@ -86,9 +82,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return student ? student.name : null;
     }
 
-    // ========================================
     // SESSION & ROLE PROTECTION
-    // ========================================
     const currentPage = window.location.pathname.split('/').pop();
     const currentUser = JSON.parse(localStorage.getItem('yic_current_user'));
 
@@ -126,9 +120,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // ========================================
     // STUDENT AUTH (student_auth.html)
-    // ========================================
+
     // Toggle between login and signup
     const studentLoginBox = document.getElementById('student-login-box');
     const studentSignupBox = document.getElementById('student-signup-box');
@@ -186,9 +179,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // ========================================
     // ADMIN AUTH (admin_auth.html) - only login
-    // ========================================
     const adminLoginForm = document.getElementById('admin-login-form');
     if (adminLoginForm) {
         adminLoginForm.addEventListener('submit', (e) => {
@@ -206,9 +197,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // ========================================
-    // LOGOUT (works everywhere)
-    // ========================================
+    // LOGOUT 
     document.addEventListener('click', (e) => {
         let target = e.target;
         while (target && target !== document.body) {
@@ -224,9 +213,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // ========================================
-    // SEARCH, REPORT, ADMIN ACTIONS (unchanged from previous working version)
-    // ========================================
+    // SEARCH, REPORT, ADMIN ACTIONS 
     const searchBar = document.querySelector('.search-bar');
     if (searchBar) {
         searchBar.addEventListener('input', (e) => {
@@ -253,7 +240,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Admin approve/reject/delete
-    document.querySelectorAll('.status-green, .btn-approve').forEach(btn => {
+    document.querySelectorAll('.status-green').forEach(btn => {
         if (btn.textContent.includes('Approve')) {
             btn.addEventListener('click', (e) => {
                 e.preventDefault();
@@ -268,7 +255,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
     });
-    document.querySelectorAll('.status-red, .btn-reject').forEach(btn => {
+    document.querySelectorAll('.status-red').forEach(btn => {
         if (btn.textContent.includes('Reject')) {
             btn.addEventListener('click', (e) => {
                 e.preventDefault();
