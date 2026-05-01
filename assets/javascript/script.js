@@ -87,7 +87,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // ── Route protection ──────────────────────────────────────
     const studentPages = ['Student_dashboard.html', 'report_item.html', 'found_items.html', 'my_claims.html'];
-    const adminPages   = ['admin_dashboard.html', 'manage_items.html', 'manage_claims.html'];
+    const adminPages   = ['admin_dashboard.html', 'manage_items.html', 'manage_claims.html', 'manage_lost_reports.html'];
 
     if (studentPages.includes(page)) {
         if (!currentUser || currentUser.role !== 'student') {
@@ -123,6 +123,21 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         if (userNameSpan) userNameSpan.textContent = user.name;
         if (userRoleSpan) userRoleSpan.textContent = user.role === 'admin' ? 'Administrator, YIC' : 'Student, YIC';
+    }
+
+    // ── Dynamic current date ──────────────────────────────────
+    function setCurrentDate() {
+        const dateElement = document.getElementById('current-date-display');
+        if (!dateElement) return;
+        const now = new Date();
+        const options = { weekday: 'long', month: 'long', day: 'numeric' };
+        const formattedDate = now.toLocaleDateString('en-US', options);
+        dateElement.textContent = `${formattedDate} | YIC Campus`;
+    }
+
+    // Call it on pages that have the date element
+    if (document.getElementById('current-date-display')) {
+        setCurrentDate();
     }
 
     // ── Logout ────────────────────────────────────────────────
@@ -249,23 +264,22 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function loadAdminDashboard() {
-        // Load counts from API
         const [itemsRes, claimsRes] = await Promise.all([
             get(`${API.foundItems}?action=getAll`),
             get(`${API.claims}?action=getAll`),
         ]);
 
         if (itemsRes.success) {
-            const items     = itemsRes.data;
+            const items = itemsRes.data;
             const delivered = items.filter(i => i.status === 'delivered').length;
-            const available = items.filter(i => i.status === 'available').length;
-            document.querySelectorAll('.stat-card')[0].querySelector('p').textContent = delivered;
-            document.querySelectorAll('.stat-card')[1].querySelector('p').textContent = available;
+            const totalFound = items.length;
+            document.getElementById('delivered-count').textContent = delivered;
+            document.getElementById('total-found-count').textContent = totalFound;
         }
 
         if (claimsRes.success) {
             const pending = claimsRes.data.filter(c => c.status === 'pending').length;
-            document.querySelectorAll('.stat-card')[2].querySelector('p').textContent = pending;
+            document.getElementById('pending-claims-count').textContent = pending;
 
             // Render recent pending claims in the table
             const tbody   = document.querySelector('.data-table tbody');
@@ -555,10 +569,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 <td data-label="Status"><span class="status-badge ${claimStatusClass(c.status)}">${claimStatusLabel(c.status)}</span></td>
                 <td data-label="Details">
                     ${c.proof_details
-                        ? `<span class="status-badge status-purple" title="${escHtml(c.proof_details)}" style="cursor:pointer;" onclick="showAlert('${escHtml(c.proof_details).replace(/'/g,'\\\'') }')">View</span>`
+                        ? `<span class="status-badge status-purple" title="${escHtml(c.proof_details)}" style="cursor:pointer;" onclick="showAlert('${escHtml(c.proof_details).replace(/'/g,'\\\'')}')">View</span>`
                         : '—'}
                 </td>
-            </tr>`).join('');
+            </table>`).join('');
     }
 
     // ════════════════════════════════════════════════════════
@@ -651,16 +665,96 @@ document.addEventListener('DOMContentLoaded', () => {
             get(`${API.foundItems}?action=getAll`),
         ]);
 
-        const cards = document.querySelectorAll('.stat-card p');
-        if (cards[0] && reportsRes.success) {
-            cards[0].textContent = reportsRes.data.filter(r => r.status === 'pending').length;
+        // Active Reports (pending)
+        if (reportsRes.success) {
+            const pendingReports = reportsRes.data.filter(r => r.status === 'pending').length;
+            document.getElementById('active-reports-count').textContent = pendingReports;
         }
-        if (cards[2] && claimsRes.success) {
-            cards[2].textContent = claimsRes.data.length;
+
+        // Total Reunited (delivered items)
+        if (itemsRes.success) {
+            const deliveredItems = itemsRes.data.filter(i => i.status === 'delivered').length;
+            document.getElementById('total-reunited-count').textContent = deliveredItems;
         }
-        if (cards[3] && itemsRes.success) {
-            cards[3].textContent = itemsRes.data.filter(i => i.status === 'available').length;
+
+        // My Claims
+        if (claimsRes.success) {
+            document.getElementById('my-claims-count').textContent = claimsRes.data.length;
         }
+
+        // Items Available
+        if (itemsRes.success) {
+            const availableItems = itemsRes.data.filter(i => i.status === 'available').length;
+            document.getElementById('items-available-count').textContent = availableItems;
+        }
+    }
+
+    // ════════════════════════════════════════════════════════
+    //  PAGE: manage_lost_reports.html (Admin view)
+    // ════════════════════════════════════════════════════════
+    if (page === 'manage_lost_reports.html') {
+        loadAllLostReports();
+    }
+
+    async function loadAllLostReports() {
+        const res = await get(`${API.lostReports}?action=getAll`);
+        const tbody = document.getElementById('lost-reports-tbody');
+        if (!tbody) return;
+
+        if (!res.success || !res.data.length) {
+            tbody.innerHTML = '<tr><td colspan="7" style="color:#888;text-align:center;">No lost reports found.</td></tr>';
+            return;
+        }
+
+        tbody.innerHTML = res.data.map(r => {
+            let statusClass = '';
+            if (r.status === 'pending') statusClass = 'status-under-review';
+            else if (r.status === 'found') statusClass = 'status-approved';
+            else if (r.status === 'closed') statusClass = 'status-red';
+
+            let actions = '';
+            if (r.status === 'pending') {
+                actions = `
+                    <div class="admin-actions">
+                        <a href="#" class="status-badge status-green mark-found-btn" data-id="${r.report_id}">Mark Found</a>
+                        <a href="#" class="status-badge status-red close-btn" data-id="${r.report_id}">Close</a>
+                    </div>`;
+            } else {
+                actions = '<span style="color:#888;">—</span>';
+            }
+
+            return `
+                <tr>
+                    <td data-label="Student">${escHtml(r.student_name)}</td>
+                    <td data-label="Item">${escHtml(r.item_name)}</td>
+                    <td data-label="Category">${cap(r.category)}</td>
+                    <td data-label="Location">${escHtml(r.location_lost)}</td>
+                    <td data-label="Date Lost">${formatDate(r.date_lost)}</td>
+                    <td data-label="Status"><span class="status-badge ${statusClass}">${cap(r.status)}</span></td>
+                    <td data-label="Action">${actions}</td>
+                </tr>`;
+        }).join('');
+
+        // Attach event listeners for status update buttons
+        tbody.querySelectorAll('.mark-found-btn').forEach(btn => {
+            btn.addEventListener('click', async (e) => {
+                e.preventDefault();
+                showConfirm('Mark this report as "found"?', async () => {
+                    const res = await post(`${API.lostReports}?action=updateStatus&id=${btn.dataset.id}`, { status: 'found' });
+                    showAlert(res.message, loadAllLostReports);
+                });
+            });
+        });
+
+        tbody.querySelectorAll('.close-btn').forEach(btn => {
+            btn.addEventListener('click', async (e) => {
+                e.preventDefault();
+                showConfirm('Close this report?', async () => {
+                    const res = await post(`${API.lostReports}?action=updateStatus&id=${btn.dataset.id}`, { status: 'closed' });
+                    showAlert(res.message, loadAllLostReports);
+                });
+            });
+        });
     }
 
     // ════════════════════════════════════════════════════════

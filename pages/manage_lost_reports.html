@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard - YIC Amanah</title>
+    <title>Lost Reports - YIC Amanah</title>
     <link rel="stylesheet" href="../assets/css/style.css">
 </head>
 <body>
@@ -14,10 +14,10 @@
             </div>
             <p style="font-size: 0.8rem; color: #888; margin-bottom: 20px;">Admin Workspace</p>
             <nav>
-                <a href="admin_dashboard.html" class="active">Dashboard</a>
+                <a href="admin_dashboard.html">Dashboard</a>
                 <a href="manage_items.html">Manage Items</a>
                 <a href="manage_claims.html">Claims requests</a>
-                <a href="manage_lost_reports.html">Lost Reports</a>
+                <a href="manage_lost_reports.html" class="active">Lost Reports</a>
             </nav>
             <div class="user-profile-menu" style="margin-top: auto; padding-top: 20px;">
                 <div style="display: flex; align-items: center; gap: 12px;">
@@ -35,35 +35,20 @@
 
         <main class="main-content">
             <header class="welcome-header">
-                <h1>Welcome back, Admin</h1>
-                <p style="color: #888;" id="current-date-display">Loading...</p>
+                <h1>Student Lost Reports</h1>
+                <p style="color: #888;">View and update status of lost item reports.</p>
             </header>
-            <section class="stats-grid">
-                <div class="stat-card">
-                    <h3>Delivered items</h3>
-                    <p id="delivered-count">0</p>
+            <section>
+                <h3>All Lost Reports</h3>
+                <div class="search-container" style="margin-top: 10px;">
+                    <input type="text" class="search-bar" placeholder="Search by item or student...">
                 </div>
-                <div class="stat-card">
-                    <h3>Total Found</h3>
-                    <p id="total-found-count">0</p>
-                </div>
-                <div class="stat-card">
-                    <h3>Pending Claims</h3>
-                    <p id="pending-claims-count">0</p>
-                </div>
-            </section>
-            <div class="action-buttons">
-                <a href="manage_items.html" class="btn-admin-primary">Post Found Items</a>
-                <a href="manage_claims.html" class="btn-admin-primary">Review Claims</a>
-            </div>
-            <section style="margin-top: 30px;">
-                <h3>Recent Pending Claims</h3>
                 <table class="data-table admin-table">
                     <thead>
-                        <tr><th>Student</th><th>Item</th><th>Date</th><th>Action</th></tr>
+                        <tr><th>Student</th><th>Item</th><th>Category</th><th>Location</th><th>Date Lost</th><th>Status</th><th>Action</th></tr>
                     </thead>
-                    <tbody>
-                        <!-- Rows will be filled by JavaScript -->
+                    <tbody id="lost-reports-tbody">
+                        <tr><td colspan="7" style="text-align:center;">Loading...</td></tr>
                     </tbody>
                 </table>
             </section>
