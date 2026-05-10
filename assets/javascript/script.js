@@ -29,9 +29,9 @@ async function get(url) {
 }
 
 /** Session helpers */
-function getSession()         { return JSON.parse(localStorage.getItem('yic_current_user')); }
-function setSession(user)     { localStorage.setItem('yic_current_user', JSON.stringify(user)); }
-function clearSession()       { localStorage.removeItem('yic_current_user'); }
+function getSession()     { return JSON.parse(sessionStorage.getItem('yic_current_user')); }
+function setSession(user) { sessionStorage.setItem('yic_current_user', JSON.stringify(user)); }
+function clearSession()   { sessionStorage.removeItem('yic_current_user'); }
 
 // ── Custom alert / confirm (unchanged UI) ────────────────────
 function showAlert(message, callback) {
@@ -79,9 +79,51 @@ function showConfirm(message, onYes, onNo) {
     newNo.onclick  = () => { box.style.display = 'none'; if (onNo)  onNo();  };
 }
 
+function showPrompt(message, onConfirm) {
+    let box = document.getElementById('custom-prompt');
+    if (!box) {
+        box = document.createElement('div');
+        box.id = 'custom-prompt';
+        box.className = 'alert-box';
+        box.innerHTML = `
+            <div class="alert-content confirm-box prompt-box">
+                <p id="prompt-message"></p>
+                <input type="text" id="prompt-input" class="prompt-input" placeholder="Type here...">
+                <div class="prompt-actions">
+                    <button id="prompt-yes" class="prompt-btn-yes">Submit</button>
+                    <button id="prompt-no" class="prompt-btn-no">Cancel</button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(box);
+    }
+
+    document.getElementById('prompt-message').innerText = message;
+    const input = document.getElementById('prompt-input');
+    input.value = ''; 
+    input.classList.remove('input-error'); 
+    box.style.display = 'flex';
+
+    document.getElementById('prompt-yes').onclick = () => {
+        const val = input.value.trim();
+        if (val) {
+            box.style.display = 'none';
+            if (onConfirm) onConfirm(val);
+        } else {
+            input.classList.add('input-error'); 
+        }
+    };
+    
+    document.getElementById('prompt-no').onclick = () => {
+        box.style.display = 'none';
+    };
+}
+
 // ── Page routing ─────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
 
+    updateAdminNotification();
+    updateStudentNotification();
     const page        = window.location.pathname.split('/').pop();
     const currentUser = getSession();
 
@@ -142,19 +184,27 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // ── Logout ────────────────────────────────────────────────
     document.addEventListener('click', (e) => {
-        let target = e.target;
-        while (target && target !== document.body) {
+       let target = e.target;
+       while (target && target !== document.body) {
             if (target.classList?.contains('logout-btn')) {
-                e.preventDefault();
-                showConfirm('Log out?', () => {
-                    clearSession();
-                    window.location.href = 'Index.html';
-                });
-                return;
-            }
-            target = target.parentElement;
+            e.preventDefault();
+            showConfirm('Log out?', async () => {
+                clearSession(); // 1. امسحي بياناته من المتصفح فوراً وبدون نقاش
+                
+                try {
+                    await post(`${API.users}?action=logout`); // 2. حاولي تقفلين الجلسة في السيرفر
+                } catch (error) {
+                    console.log("Ignored server error during logout"); // 3. لو السيرفر فيه خطأ، طنشي وكملي
+                }
+                
+                window.location.href = 'Index.html'; // 4. وجهيه للصفحة الرئيسية بكل الأحوال
+            });
+            return;
+        }
+         target = target.parentElement;
         }
     });
+   
 
     // ── Search bar (client-side filter) ──────────────────────
     const searchBar = document.querySelector('.search-bar');
@@ -234,27 +284,29 @@ document.addEventListener('DOMContentLoaded', () => {
     // ════════════════════════════════════════════════════════
     //  PAGE: admin_auth.html
     // ════════════════════════════════════════════════════════
-   document.getElementById('admin-login-form')?.addEventListener('submit', (e) => {
-    e.preventDefault();
-    const email    = document.getElementById('admin-email').value.trim().toLowerCase();
-    const password = document.getElementById('admin-password').value;
+    document.getElementById('admin-login-form')?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const email = document.getElementById('admin-email').value.trim();
+        const password = document.getElementById('admin-password').value;
 
-    const ADMIN_CREDENTIALS = [
-        { email: 'y4f441500093@rcjy.edu.sa', password: 'admin123', name: 'Khadijah Mahrous', id: 1 },
-        { email: 'y4f441500506@rcjy.edu.sa', password: 'admin123', name: 'Raneem Alfraidi',  id: 2 },
-    ];
+        const data = await post(`${API.users}?action=login`, { email, password });
 
-    const admin = ADMIN_CREDENTIALS.find(a => a.email === email && a.password === password);
-
-    if (admin) {
-        setSession({ email: admin.email, name: admin.name, role: 'admin', id: admin.id });
-        showAlert(`Welcome back, ${admin.name}!`, () => {
+       if (data.success && data.user.role === 'admin') {
+        setSession({ 
+            email: data.user.email, 
+            name: data.user.full_name, 
+            role: 'admin', 
+            id: data.user.user_id 
+        });
+        showAlert(`Welcome back, ${data.user.full_name}!`, () => {
             window.location.href = 'admin_dashboard.html';
         });
-    } else {
-        showAlert('Invalid admin credentials. Access denied.');
-    }
-});
+        } else if (data.success && data.user.role !== 'admin') {
+        showAlert('Access Denied: Admins only.');
+        } else {
+        showAlert(data.message || 'Invalid credentials.');
+      }
+    });
 
     // ════════════════════════════════════════════════════════
     //  PAGE: admin_dashboard.html
@@ -434,26 +486,36 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         tbody.innerHTML = res.data.map(c => {
-            const actions = c.status === 'pending'
-                ? `<a href="#" class="status-badge status-green approve-btn" data-id="${c.claim_id}">Approve</a>
-                   <a href="#" class="status-badge status-red reject-btn" data-id="${c.claim_id}">Reject</a>`
-                : `<span style="color:#888;">Done</span>`;
+        const actions = c.status === 'pending'
+            ? `<a href="#" class="status-badge status-green approve-btn" data-id="${c.claim_id}">Approve</a>
+               <a href="#" class="status-badge status-red reject-btn" data-id="${c.claim_id}">Reject</a>`
+            : `<span style="color:#888;">Done</span>`;
 
-            return `
-                <tr>
-                    <td data-label="Student">${escHtml(c.student_name)}</td>
-                    <td data-label="Item">${escHtml(c.item_name)}</td>
-                    <td data-label="Date">${formatDate(c.submitted_at)}</td>
-                    <td data-label="Status"><span class="status-badge ${claimStatusClass(c.status)}">${cap(c.status)}</span></td>
-                    <td data-label="Action"><div class="admin-actions">${actions}</div></td>
-                </tr>`;
-        }).join('');
+        return `
+            <tr>
+                <td data-label="Student">${escHtml(c.student_name)}</td>
+                <td data-label="Item">${escHtml(c.item_name)}</td>
+                <td data-label="Date">${formatDate(c.submitted_at)}</td>
+                <td data-label="Proof">
+                    <a href="#" class="status-badge status-teal view-proof-btn" data-proof="${escHtml(c.proof_details || 'No proof provided')}">View</a>
+                </td>
+                <td data-label="Status"><span class="status-badge ${claimStatusClass(c.status)}">${cap(c.status)}</span></td>
+                <td data-label="Action"><div class="admin-actions">${actions}</div></td>
+            </tr>
+        `;
+    }).join('');
 
         attachClaimButtons(tbody);
     }
 
     function attachClaimButtons(container) {
         const user = getSession();
+        container.querySelectorAll('.view-proof-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            showAlert(btn.dataset.proof);
+        });
+    });
 
         container.querySelectorAll('.approve-btn').forEach(btn => {
             btn.addEventListener('click', async (e) => {
@@ -528,15 +590,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 const user = getSession();
                 if (!user) { showAlert('Please log in first.'); return; }
 
-                showConfirm('Submit a claim for this item?', async () => {
-                    const proof = prompt('Briefly describe proof of ownership (e.g. what is on it, color, contents):') || '';
-                    const res   = await post(`${API.claims}?action=create`, {
-                        student_id:    user.id,
-                        item_id:       btn.dataset.id,
-                        proof_details: proof,
+                showConfirm('Submit a claim for this item?', () => {
+                   showPrompt('Briefly describe proof of ownership (e.g. what is on it, color, contents):', async (proof) => {
+                       const res = await post(`${API.claims}?action=create`, {
+                            student_id: user.id,
+                            item_id: btn.dataset.id,
+                            proof_details: proof
+                       });
+                       showAlert(res.message);
+                       if (res.success) loadFoundItems();
                     });
-                    showAlert(res.message);
-                    if (res.success) loadFoundItems();
                 });
             });
         });
@@ -780,7 +843,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function claimStatusClass(status) {
-        return { pending: 'status-under-review', approved: 'status-approved', rejected: 'status-red' }[status] || '';
+        return { pending: 'status-under-review', approved: 'status-approved', rejected: 'status-rejected' }[status] || '';
     }
 
     function claimStatusLabel(status) {
@@ -791,4 +854,82 @@ document.addEventListener('DOMContentLoaded', () => {
         return { pending: 'status-under-review', found: 'status-approved', closed: 'status-red' }[status] || '';
     }
 
+loadRecentFoundItems();
+
 }); // end DOMContentLoaded
+
+// update admin badge
+async function updateAdminNotification() {
+    const badge = document.getElementById('admin-claims-badge');
+    if (!badge) return;
+
+    const res = await get(`${API.claims}?action=getAll`);
+    if (res.success && res.data) {
+        const pendingCount = res.data.filter(c => c.status === 'pending').length;
+        if (pendingCount > 0) {
+            badge.innerText = pendingCount;
+            badge.style.display = 'inline-block';
+        } else {
+            badge.style.display = 'none';
+        }
+    }
+}
+
+// update student badge
+async function updateStudentNotification() {
+    const badge = document.getElementById('student-claims-badge');
+    if (!badge) return;
+
+    const user = getSession();
+    if (!user) return;
+
+    const res = await get(`${API.claims}?action=getByStudent&student_id=${user.id}`);
+    if (res.success && res.data) {
+        const updatedCount = res.data.filter(c => c.status !== 'pending').length;
+        if (updatedCount > 0) {
+            badge.innerText = updatedCount;
+            badge.style.display = 'inline-block';
+        } else {
+            badge.style.display = 'none';
+        }
+    }
+}
+
+
+async function loadRecentFoundItems() {
+    const grid = document.getElementById('recent-items-grid');
+    const noMessage = document.getElementById('no-items-message');
+    
+    if (!grid || !noMessage) return;
+
+    const res = await get(`${API.foundItems}?action=getRecent`);
+    
+    if (res.success && res.data && res.data.length > 0) {
+        noMessage.style.display = 'none';
+        grid.innerHTML = '';
+        
+        res.data.forEach(item => {
+            const card = document.createElement('div');
+            card.className = 'recent-card';
+            
+            const itemName = escHtml(item.item_name);
+            const location = escHtml(item.location_found);
+            const date     = formatDate(item.date_found);
+            
+            card.innerHTML = `
+                <div>
+                    <h4>${itemName}</h4>
+                    <div class="meta">${location} - ${date}</div>
+                </div>
+                <div class="actions">
+                    <a href="found_items.html?claim_id=${item.item_id}">Claim it</a>
+                    <a href="found_items.html?detail_id=${item.item_id}">Details</a>
+                </div>
+            `;
+            grid.appendChild(card);
+        });
+    } else {
+        noMessage.style.display = 'block';
+        grid.innerHTML = '';
+    }
+}

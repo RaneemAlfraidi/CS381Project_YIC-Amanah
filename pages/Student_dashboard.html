@@ -19,7 +19,7 @@
         <a href="Student_dashboard.html" class="active">Dashboard</a>
         <a href="report_item.html">Report Lost</a>
         <a href="found_items.html">Found Items</a>
-        <a href="my_claims.html">My Claims</a>   
+        <a href="my_claims.html">My claims <span id="student-claims-badge" class="nav-badge"></span></a>
       </nav>
       <div class="user-profile-menu" style="margin-top: auto; padding-top: 20px;">
         <div style="display: flex; align-items: center; gap: 12px;">
@@ -66,12 +66,16 @@
         <a href="found_items.html" class="btn-student">Browse Found Items</a>
       </div>
 
-      <section style="margin-top: 30px;">
-        <h3>Recently Found on Campus</h3>
-        <p style="color: #888; margin-top: 10px;">New items will appear here after admin approval.</p>
-      </section>
-    </main>
-  </div>
+    
+     <section style="margin-top: 30px;">
+       <h3>Recently Found on Campus</h3>
+    
+        <div id="recent-items-grid" class="recent-grid"></div>
+    
+        <p id="no-items-message" style="color: #888; margin-top: 10px;">
+           New items will appear here after admin approval.
+        </p>
+     </section>
 
   <div id="custom-alert" class="alert-box" style="display:none;">
     <div class="alert-content"><p id="alert-message"></p><button id="alert-ok">OK</button></div>

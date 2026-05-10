@@ -16,7 +16,8 @@
   --border-input: #444;
   --bg-glass: #1e1e1e99;
   --shadow-panel: 0 10px 30px #00000066;
-  --shadow-card: 0 4px 10px #00000033; }
+  --shadow-card: 0 4px 10px #00000033; 
+  --danger: #7f2d2d; }
 
 * {
   box-sizing: border-box;
@@ -322,6 +323,12 @@ button:hover, .btn-admin-primary:hover {
   --status-hover-color: #fff;
   --status-hover-bg: #241d35;
   --status-hover-border: var(--purple-dark); }
+.status-teal {
+  --status-color: var(--teal);
+  --status-bg: #0d1a1a;
+  --status-border: var(--teal-dark);
+  --status-hover-color: #fff;
+  --status-hover-bg: var(--teal-dark); }
 .status-green {
   --status-hover-color: #fff;
   --status-hover-bg: #155724; }
@@ -331,6 +338,25 @@ button:hover, .btn-admin-primary:hover {
   --status-border: #7f1d1d;
   --status-hover-color: #fff;
   --status-hover-bg: #7f1d1d; }
+.status-rejected {
+  --status-color: #f87171;
+  --status-bg: #1f1212;
+  --status-border: #7f1d1d; }
+
+.status-badge.status-approved,
+.status-badge.status-rejected,
+.status-badge.status-under-review,
+.status-badge.status-red,   
+.status-badge.status-green { 
+    cursor: default;
+    pointer-events: none;   
+}
+
+a.status-badge.status-red,
+button.status-badge.status-red {
+    cursor: pointer;
+    pointer-events: auto;
+}
 
 .auth-page {                  /* Authentication section styling */
   display: flex;
@@ -515,28 +541,107 @@ button:hover, .btn-admin-primary:hover {
   backdrop-filter: blur(4px);}
 
 .alert-content {
-  background: #1e1e1e;
-  border-radius: 20px;
-  padding: 25px 20px;
-  text-align: center;
-  max-width: 280px;
-  width: 85%;
-  border: 1px solid #1b2a4e;;
-  box-shadow: 0 20px 35px rgba(0, 0, 0, 0.5); }
+  background: #1e1e1e; border-radius: 20px;  padding: 25px 20px;
+  text-align: center; max-width: 280px;  width: 85%;
+  border: 1px solid #1b2a4e;;  box-shadow: 0 20px 35px rgba(0, 0, 0, 0.5); }
+  
 .alert-content p {
-  color: #fff;
-  margin-bottom: 20px;
-  font-size: 1rem; }
+  color: #fff; margin-bottom: 20px; font-size: 1rem; }
 
 .alert-content button {
-  background: #1b2a4e;;
-  border: none;
-  color: white;
-  padding: 10px 25px;
-  border-radius: 8px;
-  font-weight: bold;
-  cursor: pointer;
-  font-size: 1rem;
-  transition: 0.2s; }
+  background: #1b2a4e;; border: none; color: white;
+  padding: 10px 25px; border-radius: 8px; font-weight: bold;
+  cursor: pointer; font-size: 1rem; transition: 0.2s; }
+
 .alert-content button:hover {
   background: #3b82f6; }
+
+ /* Custom Prompt Box */
+.prompt-box { width: 90%; max-width: 400px; }
+
+.prompt-input {
+    width: 100%; box-sizing: border-box; font-family: inherit;
+    padding: 10px; margin: 15px 0;
+    background: var(--bg-input); color: var(--text-main);
+    border: 1px solid var(--border-input); border-radius: 5px; }
+
+.prompt-input:focus { 
+  outline: none; border-color: #888; }
+.prompt-input.input-error { 
+  border-color: var(--danger) !important; }
+
+.prompt-actions { 
+  display: flex; gap: 15px; justify-content: center; }
+
+.prompt-btn-yes { 
+  background-color: #2b5c3f; }
+.prompt-btn-no  { 
+  background-color: var(--danger); }
+
+  /* notification badges */
+.nav-badge {
+    display: none;
+    padding: 2px 7px;
+    border-radius: 20px;
+    margin-left: 8px;
+    font-size: 0.75rem;
+    font-weight: bold;
+    line-height: 1;
+    color: #f87171;           
+    background-color: #1f1212; 
+    border: 1px solid #7f1d1d; 
+    cursor: default;
+}
+
+.sidebar nav a {
+    display: flex;
+    align-items: center;
+}
+
+/* شبكة عرض أحدث الأغراض */
+.recent-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 15px;
+    margin-top: 15px;
+}
+
+/* بطاقة الغرض الفردية */
+.recent-card {
+    background-color: #1a1a1a;
+    border: 1px solid #333;
+    border-radius: 6px;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 120px;
+}
+
+.recent-card h4 {
+    margin: 0;
+    font-size: 1rem;
+    color: #fff;
+}
+
+.recent-card .meta {
+    font-size: 0.75rem;
+    color: var(--teal);
+    margin-top: 5px;
+}
+
+.recent-card .actions {
+    margin-top: 15px;
+    display: flex;
+    gap: 10px;
+    font-size: 0.8rem;
+}
+
+.recent-card .actions a {
+    color: #bbb;
+    text-decoration: underline;
+}
+
+.recent-card .actions a:hover {
+    color: #fff;
+}

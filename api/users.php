@@ -12,7 +12,7 @@
 //    POST ?action=delete&id=3       – admin: delete a user
 //    POST ?action=changePassword&id=3
 // ============================================================
-
+session_start();
 require_once '../config/db.php';
 
 header('Content-Type: application/json');
@@ -50,6 +50,10 @@ switch ($action) {
     case 'changePassword':
         $id = (int)($_GET['id'] ?? 0);
         changePassword($id);
+        break;
+
+    case 'logout':
+        logoutUser();
         break;
 
     default:
@@ -138,6 +142,8 @@ function loginUser(): void {
     // For the seeded admin rows (which have placeholder hashes) you would
     // update their passwords via changePassword() before going live.
     if ($user && password_verify($password, $user['password'])) {
+        $_SESSION['user_id'] = $user['user_id'];
+        $_SESSION['role']    = $user['role'];
         // Don't return the hashed password to the client
         unset($user['password']);
         echo json_encode(['success' => true, 'message' => 'Login successful.', 'user' => $user]);
@@ -268,6 +274,11 @@ function changePassword(int $id): void {
     if (!$user || !password_verify($current, $user['password'])) {
         echo json_encode(['success' => false, 'message' => 'Current password is incorrect.']);
         return;
+    }
+
+    function logoutUser() {
+      session_destroy();
+      echo json_encode(['success' => true, 'message' => 'Logged out successfully.']);
     }
 
     $hashed = password_hash($new_pass, PASSWORD_BCRYPT);

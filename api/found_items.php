@@ -75,6 +75,10 @@ switch ($action) {
         updateStatus($id);
         break;
 
+    case 'getRecent':
+        getRecentItems();
+        break;
+
     default:
         echo json_encode(['success' => false, 'message' => 'Invalid action.']);
         break;
@@ -266,4 +270,18 @@ function updateStatus(int $id): void {
     $stmt->execute([':status' => $status, ':id' => $id]);
 
     echo json_encode(['success' => true, 'message' => 'Status updated to "' . $status . '".']);
-}
+
+    function getRecentItems(): void {
+    $pdo = getDB();
+    $stmt = $pdo->prepare("
+        SELECT item_id, item_name, location_found, date_found 
+        FROM found_items 
+        WHERE status = 'available' 
+        ORDER BY created_at DESC 
+        LIMIT 3
+    ");
+    $stmt->execute();
+    $items = $stmt->fetchAll();
+    
+    echo json_encode(['success' => true, 'data' => $items]);
+}}
