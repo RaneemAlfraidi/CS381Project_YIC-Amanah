@@ -1,8 +1,4 @@
 <?php
-// ============================================================
-//  YIC Amanah – Found Items CRUD (FULLY CORRECTED)
-// ============================================================
-
 require_once '../config/db.php';
 header('Content-Type: application/json');
 
@@ -16,13 +12,12 @@ switch ($action) {
     case 'update':        updateItem((int)($_GET['id'] ?? 0)); break;
     case 'delete':        deleteItem((int)($_GET['id'] ?? 0)); break;
     case 'updateStatus':  updateStatus((int)($_GET['id'] ?? 0)); break;
-    case 'getRecent':     getRecentItems(); break;   // <-- FIXED endpoint
+    case 'getRecent':     getRecentItems(); break;   
     default:
         echo json_encode(['success' => false, 'message' => 'Invalid action.']);
         break;
 }
 
-// ---------- existing functions ----------
 function getAllItems(): void {
     $pdo  = getDB();
     $stmt = $pdo->prepare("
@@ -168,7 +163,6 @@ function updateStatus(int $id): void {
     echo json_encode(['success' => true, 'message' => 'Status updated to "' . $status . '".']);
 }
 
-// ---------- NEW standalone function for recent items ----------
 function getRecentItems(): void {
     $pdo = getDB();
     $stmt = $pdo->prepare("
