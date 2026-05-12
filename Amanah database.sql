@@ -1,21 +1,13 @@
-yic_amanahyic_amanah-- ============================================================
---  YIC Amanah - Lost & Found System
---  Database Schema + Sample Data
---  Phase 3 - Part 1
--- ============================================================
-
+yic_amanahyic_amanah
 CREATE DATABASE IF NOT EXISTS yic_amanah;
 USE yic_amanah;
 
--- ============================================================
--- TABLE 1: users
--- Stores both students and admins
--- ============================================================
+
 CREATE TABLE users (
     user_id     INT AUTO_INCREMENT PRIMARY KEY,
     full_name   VARCHAR(100) NOT NULL,
     email       VARCHAR(150) NOT NULL UNIQUE,
-    password    VARCHAR(255) NOT NULL,          -- store hashed passwords in production
+    password    VARCHAR(255) NOT NULL,          
     role        ENUM('student', 'admin') NOT NULL DEFAULT 'student',
     created_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -34,10 +26,7 @@ INSERT INTO users (full_name, email, password, role) VALUES
 ('Wafa Al-Sayed',      'wafa.sayed@rcjy.edu.sa',    '$2y$10$hashedpw11','student'),
 ('Jana Al-Rashidi',    'jana.rashidi@rcjy.edu.sa',  '$2y$10$hashedpw12','student');
 
--- ============================================================
--- TABLE 2: found_items
--- Items posted by admins as found on campus
--- ============================================================
+
 CREATE TABLE found_items (
     item_id         INT AUTO_INCREMENT PRIMARY KEY,
     item_name       VARCHAR(150) NOT NULL,
@@ -46,7 +35,7 @@ CREATE TABLE found_items (
     location_found  VARCHAR(200) NOT NULL,
     date_found      DATE NOT NULL,
     status          ENUM('available', 'claimed', 'delivered') NOT NULL DEFAULT 'available',
-    posted_by       INT NOT NULL,               -- references users(user_id) admin
+    posted_by       INT NOT NULL,               
     created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (posted_by) REFERENCES users(user_id)
 );
@@ -65,13 +54,10 @@ INSERT INTO found_items (item_name, category, description, location_found, date_
 ('Makeup Pouch',        'personal',    'Small floral-print fabric pouch containing makeup items',               'Restroom – Bldg A',  '2026-04-02', 'available',  2),
 ('USB Flash Drive',     'electronics', '32GB SanDisk flash drive, red color, has academic files',               'Computer Lab 1',     '2026-03-25', 'available',  1);
 
--- ============================================================
--- TABLE 3: lost_reports
--- Reports submitted by students for items they lost
--- ============================================================
+
 CREATE TABLE lost_reports (
     report_id       INT AUTO_INCREMENT PRIMARY KEY,
-    student_id      INT NOT NULL,               -- references users(user_id) student
+    student_id      INT NOT NULL,               
     item_name       VARCHAR(150) NOT NULL,
     category        ENUM('electronics', 'personal', 'books', 'accessories', 'other') NOT NULL,
     description     TEXT,
@@ -96,17 +82,12 @@ INSERT INTO lost_reports (student_id, item_name, category, description, location
 (3,  'Airpods Pro',         'electronics', 'White AirPods Pro, case has a small scratch on lid',    'Cafeteria',         '2026-04-05', 'found'),
 (5,  'Physics Textbook',    'books',       'University Physics 14th edition, highlighted pages',     'Library',           '2026-02-20', 'closed');
 
--- ============================================================
--- TABLE 4: claims
--- Students claiming found items
--- ============================================================
 CREATE TABLE claims (
     claim_id        INT AUTO_INCREMENT PRIMARY KEY,
     student_id      INT NOT NULL,
     item_id         INT NOT NULL,
-    proof_details   TEXT,                       -- student's written proof of ownership
     status          ENUM('pending', 'approved', 'rejected') NOT NULL DEFAULT 'pending',
-    reviewed_by     INT,                        -- admin who reviewed
+    reviewed_by     INT,                        
     reviewed_at     TIMESTAMP NULL,
     submitted_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (student_id) REFERENCES users(user_id),
