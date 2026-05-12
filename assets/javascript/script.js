@@ -1,7 +1,3 @@
-// ============================================================
-//  YIC Amanah – Main Script (Refactored & Shortened)
-// ============================================================
-
 const API = {
     users:       '../api/users.php',
     foundItems:  '../api/found_items.php',
@@ -9,7 +5,6 @@ const API = {
     claims:      '../api/claims.php',
 };
 
-// ---- Helpers -------------------------------------------------
 async function post(url, data = {}) {
     const fd = new FormData();
     Object.entries(data).forEach(([k, v]) => fd.append(k, v));
@@ -26,7 +21,6 @@ function esc(str) { return String(str ?? '').replace(/[&<>]/g, (m) => ({ '&':'&a
 function formatDate(d) { return d ? new Date(d).toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' }) : '—'; }
 function cap(s) { return s ? s[0].toUpperCase() + s.slice(1) : ''; }
 
-// ---- Modal Dialogs (single factory) -------------------------
 function createModal(id, html) {
     let el = document.getElementById(id);
     if (!el) {
@@ -66,7 +60,6 @@ function showPrompt(msg, onConfirm) {
     document.getElementById('prompt-no').onclick = () => { promptModal.style.display = 'none'; };
 }
 
-// ---- Notification badges -------------------------------------
 async function updateAdminBadge() {
     const badge = document.getElementById('admin-claims-badge');
     if (!badge) return;
@@ -84,7 +77,6 @@ async function updateStudentBadge() {
     badge.style.display = count ? 'inline-block' : 'none';
 }
 
-// ---- Render helpers for common patterns ----------------------
 function statusClass(status, type = 'item') {
     const map = { available: 'status-green', claimed: 'status-under-review', delivered: 'status-approved',
                   pending: 'status-under-review', approved: 'status-approved', rejected: 'status-rejected',
@@ -96,21 +88,18 @@ function statusLabel(status) {
     return map[status] || cap(status);
 }
 
-// Generic table renderer with action handlers
 function renderTable(tbody, rows, columns, rowRenderer) {
     if (!tbody) return;
     if (!rows.length) { tbody.innerHTML = `<tr><td colspan="${columns}" style="text-align:center;">No data</td></tr>`; return; }
     tbody.innerHTML = rows.map(rowRenderer).join('');
 }
 
-// Attach action buttons via delegation (no per‑button cloning)
 function attachDelegatedActions(container, selector, handler) {
     if (!container) return;
     container.querySelectorAll(selector).forEach(btn => btn.removeEventListener('click', handler));
     container.querySelectorAll(selector).forEach(btn => btn.addEventListener('click', handler));
 }
 
-// ---- Page‑specific loaders (each is now much shorter) -------
 async function loadAdminDashboard() {
     const user = getSession();
     const [items, claims] = await Promise.all([get(`${API.foundItems}?action=getAll`), get(`${API.claims}?action=getAll`)]);
@@ -311,7 +300,6 @@ async function loadRecentFoundItems() {
     } else { noMsg && (noMsg.style.display = 'block'); grid.innerHTML = ''; }
 }
 
-// ---- Authentication pages (unchanged logic, slightly shortened) ----
 function initStudentAuth() {
     const loginBox = document.getElementById('student-login-box'), signupBox = document.getElementById('student-signup-box');
     if (!loginBox) return;
@@ -366,7 +354,6 @@ function initAdminAuth() {
             full_name, email, password, confirm_password, invite_token
         });
         if (reg.success) {
-            // Auto-login using the same credentials from the form
             const login = await post(`${API.users}?action=login`, { email, password });
             if (login.success && login.user.role === 'admin') {
                 setSession({ email: login.user.email, name: login.user.full_name, role: 'admin', id: login.user.user_id });
@@ -383,13 +370,11 @@ function initAdminAuth() {
     });
 }
 
-// ---- Main router & DOMContentLoaded --------------------------
 document.addEventListener('DOMContentLoaded', () => {
     updateAdminBadge(); updateStudentBadge();
     const page = window.location.pathname.split('/').pop();
     const user = getSession();
 
-    // Route protection
     const studentPages = ['Student_dashboard.html','report_item.html','found_items.html','my_claims.html'];
     const adminPages   = ['admin_dashboard.html','manage_items.html','manage_claims.html','manage_lost_reports.html'];
     if (studentPages.includes(page) && (!user || user.role !== 'student')) {
@@ -399,7 +384,6 @@ document.addEventListener('DOMContentLoaded', () => {
         showAlert('Admin area only.', () => location.href='admin_auth.html'); return;
     }
 
-    // Update UI with user data
     if (user) {
         const welcome = document.querySelector('.welcome-header h1');
         if (welcome && welcome.innerText.includes('Welcome back,')) welcome.innerText = `Welcome back, ${user.name.split(' ')[0]}`;
@@ -415,7 +399,6 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('current-date-display').innerText = `${d.toLocaleDateString('en-US', { weekday:'long', month:'long', day:'numeric' })} | YIC Campus`;
     })();
 
-    // Logout
     document.addEventListener('click', e => {
         let t = e.target; while(t && t !== document.body) {
             if (t.classList?.contains('logout-btn')) {
@@ -426,14 +409,12 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Search filter
     const search = document.querySelector('.search-bar');
     if (search) search.addEventListener('input', e => {
         const term = e.target.value.toLowerCase();
         document.querySelectorAll('.item-card, .data-table tbody tr').forEach(el => el.style.display = el.innerText.toLowerCase().includes(term) ? '' : 'none');
     });
 
-    // Page initialisation
     const form = document.getElementById('add-item-form');
     if (form) form.addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -461,7 +442,6 @@ document.addEventListener('DOMContentLoaded', () => {
         else showAlert(res.message);
     });
 
-    // Page routing
     switch (page) {
         case 'student_auth.html': initStudentAuth(); break;
         case 'admin_auth.html': initAdminAuth(); break;
