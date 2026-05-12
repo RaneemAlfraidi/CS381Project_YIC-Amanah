@@ -342,6 +342,23 @@ button:hover, .btn-admin-primary:hover {
   --status-color: #f87171;
   --status-bg: #1f1212;
   --status-border: #7f1d1d; }
+  /* Fix for clickable action badges (Approve, Reject, Edit, Delete, etc.) */
+a.status-badge.status-green,
+a.status-badge.status-red,
+button.status-badge.status-green,
+button.status-badge.status-red {
+    pointer-events: auto !important;
+    cursor: pointer;
+}
+
+/* Keep non-interactive badges untouched */
+.status-badge.status-approved,
+.status-badge.status-rejected,
+.status-badge.status-under-review,
+.status-badge.status-red,
+.status-badge.status-green {
+    pointer-events: none;
+}
 
 .status-badge.status-approved,
 .status-badge.status-rejected,

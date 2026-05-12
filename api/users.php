@@ -86,19 +86,30 @@ function registerUser() {
     respond(true, 'Account created successfully.', ['user_id' => $id]);
 }
 
-// ---------- admin invite ----------
+// ---------- admin invite (FIXED: no session, uses POST admin_id) ----------
 function generateInvite() {
-    if (empty($_SESSION['role']) || $_SESSION['role'] !== 'admin')
-        respond(false, 'Admin authentication required.');
+    // Get admin ID from POST (sent by front-end from sessionStorage)
+    $admin_id = (int)($_POST['admin_id'] ?? 0);
+    if ($admin_id <= 0) {
+        respond(false, 'Valid admin ID is required.');
+    }
 
     $pdo = getDB();
+    // Verify that this user exists and is an admin
+    $stmt = $pdo->prepare("SELECT role FROM users WHERE user_id = ?");
+    $stmt->execute([$admin_id]);
+    $user = $stmt->fetch();
+    if (!$user || $user['role'] !== 'admin') {
+        respond(false, 'Admin authentication required.');
+    }
+
     ensureInviteTable($pdo);
 
     $token = bin2hex(random_bytes(32));
     $expires = date('Y-m-d H:i:s', strtotime('+24 hours'));
 
     $pdo->prepare("INSERT INTO admin_invites (token, created_by, expires_at) VALUES (?, ?, ?)")
-        ->execute([$token, $_SESSION['user_id'], $expires]);
+        ->execute([$token, $admin_id, $expires]);
 
     respond(true, 'Invite token generated (valid 24h).', ['token' => $token, 'expires_at' => $expires]);
 }
