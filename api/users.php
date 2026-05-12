@@ -1,8 +1,4 @@
 <?php
-// ============================================================
-//  YIC Amanah – Users API (invite‑token admin registration)
-// ============================================================
-
 session_start();
 require_once '../config/db.php';
 header('Content-Type: application/json');
@@ -24,7 +20,6 @@ switch ($action) {
         echo json_encode(['success' => false, 'message' => 'Invalid action.']);
 }
 
-// ---------- helpers ----------
 function respond($success, $message, $extra = []) {
     echo json_encode(array_merge(['success' => $success, 'message' => $message], $extra));
     exit;
@@ -68,7 +63,6 @@ function ensureInviteTable($pdo) {
     ");
 }
 
-// ---------- student registration ----------
 function registerUser() {
     $name = trim($_POST['full_name'] ?? '');
     $email = strtolower(trim($_POST['email'] ?? ''));
@@ -86,16 +80,13 @@ function registerUser() {
     respond(true, 'Account created successfully.', ['user_id' => $id]);
 }
 
-// ---------- admin invite (FIXED: no session, uses POST admin_id) ----------
 function generateInvite() {
-    // Get admin ID from POST (sent by front-end from sessionStorage)
     $admin_id = (int)($_POST['admin_id'] ?? 0);
     if ($admin_id <= 0) {
         respond(false, 'Valid admin ID is required.');
     }
 
     $pdo = getDB();
-    // Verify that this user exists and is an admin
     $stmt = $pdo->prepare("SELECT role FROM users WHERE user_id = ?");
     $stmt->execute([$admin_id]);
     $user = $stmt->fetch();
@@ -140,7 +131,6 @@ function registerAdmin() {
     respond(true, 'Admin account created successfully.', ['user_id' => $newId]);
 }
 
-// ---------- login / logout ----------
 function loginUser() {
     $email = strtolower(trim($_POST['email'] ?? ''));
     $pass = $_POST['password'] ?? '';
@@ -166,7 +156,6 @@ function logoutUser() {
     respond(true, 'Logged out successfully.');
 }
 
-// ---------- user CRUD ----------
 function getAllUsers() {
     $pdo = getDB();
     $stmt = $pdo->query("SELECT user_id, full_name, email, role, created_at FROM users ORDER BY created_at DESC");
