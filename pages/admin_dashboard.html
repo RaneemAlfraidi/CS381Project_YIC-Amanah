@@ -9,22 +9,22 @@
 <body>
     <div class="dashboard-container">
         <aside class="sidebar admin">
-            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 5px;">
+            <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                 <img src="../assets/media/logo.svg" alt="YIC Amanah Logo" width="200" height="150">
             </div>
-            <p style="font-size: 0.8rem; color: #888; margin-bottom: 20px;">Admin Workspace</p>
+            <p style="font-size:0.8rem; color:#888; margin-bottom:20px;">Admin Workspace</p>
             <nav>
                 <a href="admin_dashboard.html" class="active">Dashboard</a>
                 <a href="manage_items.html">Manage Items</a>
                 <a href="manage_claims.html">Claims requests <span id="admin-claims-badge" class="nav-badge"></span></a>
                 <a href="manage_lost_reports.html">Lost Reports</a>
             </nav>
-            <div class="user-profile-menu" style="margin-top: auto; padding-top: 20px;">
-                <div style="display: flex; align-items: center; gap: 12px;">
+            <div class="user-profile-menu" style="margin-top:auto; padding-top:20px;">
+                <div style="display:flex; align-items:center; gap:12px;">
                     <div class="user-avatar">KM</div>
                     <div>
-                        <p style="color: #e0e0e0;"><strong>Khadijah Mahrous</strong></p>
-                        <p style="font-size: 0.8rem; color: #aaa;">Administrator, YIC</p>
+                        <p style="color:#e0e0e0;"><strong>Khadijah Mahrous</strong></p>
+                        <p style="font-size:0.8rem; color:#aaa;">Administrator, YIC</p>
                     </div>
                 </div>
                 <div class="dropdown-content">
@@ -36,11 +36,12 @@
         <main class="main-content">
             <header class="welcome-header">
                 <h1>Welcome back, Admin</h1>
-                <p style="color: #888;" id="current-date-display">Loading...</p>
+                <p style="color:#888;" id="current-date-display">Loading...</p>
             </header>
+
             <section class="stats-grid">
                 <div class="stat-card">
-                    <h3>Delivered items</h3>
+                    <h3>Delivered Items</h3>
                     <p id="delivered-count">0</p>
                 </div>
                 <div class="stat-card">
@@ -52,19 +53,22 @@
                     <p id="pending-claims-count">0</p>
                 </div>
             </section>
+
             <div class="action-buttons">
                 <a href="manage_items.html" class="btn-admin-primary">Post Found Items</a>
                 <a href="manage_claims.html" class="btn-admin-primary">Review Claims</a>
+                <button id="generate-invite-btn" class="btn-admin-primary" title="Generate a one-time invite token to register a new admin">
+                    &#128273; Generate Admin Invite
+                </button>
             </div>
-            <section style="margin-top: 30px;">
+
+            <section style="margin-top:30px;">
                 <h3>Recent Pending Claims</h3>
                 <table class="data-table admin-table">
                     <thead>
                         <tr><th>Student</th><th>Item</th><th>Date</th><th>Action</th></tr>
                     </thead>
-                    <tbody>
-                        <!-- Rows will be filled by JavaScript -->
-                    </tbody>
+                    <tbody></tbody>
                 </table>
             </section>
         </main>

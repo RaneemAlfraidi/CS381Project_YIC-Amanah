@@ -541,9 +541,25 @@ button.status-badge.status-red {
   backdrop-filter: blur(4px);}
 
 .alert-content {
-  background: #1e1e1e; border-radius: 20px;  padding: 25px 20px;
-  text-align: center; max-width: 280px;  width: 85%;
-  border: 1px solid #1b2a4e;;  box-shadow: 0 20px 35px rgba(0, 0, 0, 0.5); }
+  background: #1e1e1e;
+  border-radius: 20px;
+  padding: 25px 20px;
+  text-align: center;
+  max-width: 450px; /* Increased max-width to accommodate longer tokens */
+  width: 90%;
+  border: 1px solid #1b2a4e;
+  box-shadow: 0 20px 35px rgba(0, 0, 0, 0.5);
+  word-wrap: break-word; /* Forces the long hash to wrap */
+  overflow-wrap: break-word;
+}
+#alert-message {
+  white-space: pre-wrap; /* Preserves the line breaks from your JS */
+  word-break: break-all; /* Ensures the long hash breaks at any character to stay inside */
+  color: #fff;
+  margin-bottom: 20px;
+  font-size: 0.95rem;
+  line-height: 1.4;
+}
   
 .alert-content p {
   color: #fff; margin-bottom: 20px; font-size: 1rem; }

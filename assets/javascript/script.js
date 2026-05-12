@@ -1,7 +1,7 @@
 // ============================================================
 //  YIC Amanah – Main Script (Phase 3 rewrite)
 //  All data now comes from the PHP API via fetch().
-//  localStorage is only used to hold the session user object.
+//  sessionStorage is used to hold the session user object.
 // ============================================================
 
 // ── API base paths ───────────────────────────────────────────
@@ -33,7 +33,7 @@ function getSession()     { return JSON.parse(sessionStorage.getItem('yic_curren
 function setSession(user) { sessionStorage.setItem('yic_current_user', JSON.stringify(user)); }
 function clearSession()   { sessionStorage.removeItem('yic_current_user'); }
 
-// ── Custom alert / confirm (unchanged UI) ────────────────────
+// ── Custom alert / confirm / prompt (unchanged UI) ──────────
 function showAlert(message, callback) {
     let box = document.getElementById('custom-alert');
     if (!box) {
@@ -119,6 +119,126 @@ function showPrompt(message, onConfirm) {
     };
 }
 
+// ── Utility functions for display ───────────────────────────
+function escHtml(str) {
+    return String(str ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function formatDate(dateStr) {
+    if (!dateStr) return '—';
+    const d = new Date(dateStr);
+    return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+}
+
+function cap(str) {
+    return str ? str.charAt(0).toUpperCase() + str.slice(1) : '';
+}
+
+function statusClass(status) {
+    return { available: 'status-green', claimed: 'status-under-review', delivered: 'status-approved' }[status] || '';
+}
+
+function claimStatusClass(status) {
+    return { pending: 'status-under-review', approved: 'status-approved', rejected: 'status-rejected' }[status] || '';
+}
+
+function claimStatusLabel(status) {
+    return { pending: 'Pending Review', approved: 'Approved', rejected: 'Rejected' }[status] || cap(status);
+}
+
+function reportStatusClass(status) {
+    return { pending: 'status-under-review', found: 'status-approved', closed: 'status-red' }[status] || '';
+}
+
+// ── Badge updaters (renamed but fully functional) ───────────
+async function updateAdminNotification() {
+    const badge = document.getElementById('admin-claims-badge');
+    if (!badge) return;
+    const res = await get(`${API.claims}?action=getAll`);
+    if (res.success && res.data) {
+        const pendingCount = res.data.filter(c => c.status === 'pending').length;
+        if (pendingCount > 0) {
+            badge.innerText = pendingCount;
+            badge.style.display = 'inline-block';
+        } else {
+            badge.style.display = 'none';
+        }
+    }
+}
+
+async function updateStudentNotification() {
+    const badge = document.getElementById('student-claims-badge');
+    if (!badge) return;
+    const user = getSession();
+    if (!user) return;
+    const res = await get(`${API.claims}?action=getByStudent&student_id=${user.id}`);
+    if (res.success && res.data) {
+        const updatedCount = res.data.filter(c => c.status !== 'pending').length;
+        if (updatedCount > 0) {
+            badge.innerText = updatedCount;
+            badge.style.display = 'inline-block';
+        } else {
+            badge.style.display = 'none';
+        }
+    }
+}
+
+// ── Global claim action buttons (approve/reject/view) with badge refresh ──
+function attachClaimButtons(container, refreshCallback) {
+    // Approve buttons
+    container.querySelectorAll('.approve-btn').forEach(btn => {
+        // Remove old listener to avoid duplicates
+        const newBtn = btn.cloneNode(true);
+        btn.parentNode.replaceChild(newBtn, btn);
+        newBtn.addEventListener('click', async (e) => {
+            e.preventDefault();
+            const user = getSession();
+            showConfirm('Approve this claim?', async () => {
+                const res = await post(`${API.claims}?action=review&id=${newBtn.dataset.id}`, {
+                    status: 'approved',
+                    reviewed_by: user?.id,
+                });
+                showAlert(res.message, () => {
+                    if (refreshCallback) refreshCallback();
+                    updateAdminNotification();
+                    updateStudentNotification();
+                });
+            });
+        });
+    });
+
+    // Reject buttons
+    container.querySelectorAll('.reject-btn').forEach(btn => {
+        const newBtn = btn.cloneNode(true);
+        btn.parentNode.replaceChild(newBtn, btn);
+        newBtn.addEventListener('click', async (e) => {
+            e.preventDefault();
+            const user = getSession();
+            showConfirm('Reject this claim?', async () => {
+                const res = await post(`${API.claims}?action=review&id=${newBtn.dataset.id}`, {
+                    status: 'rejected',
+                    reviewed_by: user?.id,
+                });
+                showAlert(res.message, () => {
+                    if (refreshCallback) refreshCallback();
+                    updateAdminNotification();
+                    updateStudentNotification();
+                });
+            });
+        });
+    });
+
+    // View proof buttons
+    container.querySelectorAll('.view-proof-btn').forEach(btn => {
+        const newBtn = btn.cloneNode(true);
+        btn.parentNode.replaceChild(newBtn, btn);
+        newBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            showAlert(newBtn.dataset.proof);
+        });
+    });
+}
+
 // ── Page routing ─────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
 
@@ -176,8 +296,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const formattedDate = now.toLocaleDateString('en-US', options);
         dateElement.textContent = `${formattedDate} | YIC Campus`;
     }
-
-    // Call it on pages that have the date element
     if (document.getElementById('current-date-display')) {
         setCurrentDate();
     }
@@ -187,24 +305,21 @@ document.addEventListener('DOMContentLoaded', () => {
        let target = e.target;
        while (target && target !== document.body) {
             if (target.classList?.contains('logout-btn')) {
-            e.preventDefault();
-            showConfirm('Log out?', async () => {
-                clearSession(); // 1. امسحي بياناته من المتصفح فوراً وبدون نقاش
-                
-                try {
-                    await post(`${API.users}?action=logout`); // 2. حاولي تقفلين الجلسة في السيرفر
-                } catch (error) {
-                    console.log("Ignored server error during logout"); // 3. لو السيرفر فيه خطأ، طنشي وكملي
-                }
-                
-                window.location.href = 'Index.html'; // 4. وجهيه للصفحة الرئيسية بكل الأحوال
-            });
-            return;
-        }
-         target = target.parentElement;
+                e.preventDefault();
+                showConfirm('Log out?', async () => {
+                    clearSession();
+                    try {
+                        await post(`${API.users}?action=logout`);
+                    } catch (error) {
+                        console.log("Ignored server error during logout");
+                    }
+                    window.location.href = 'Index.html';
+                });
+                return;
+            }
+            target = target.parentElement;
         }
     });
-   
 
     // ── Search bar (client-side filter) ──────────────────────
     const searchBar = document.querySelector('.search-bar');
@@ -217,9 +332,9 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // ════════════════════════════════════════════════════════
-    //  PAGE: student_auth.html
-    // ════════════════════════════════════════════════════════
+    // ══════════════════════════════════════════════════════════
+    //  PAGE: student_auth.html (unchanged, fully functional)
+    // ══════════════════════════════════════════════════════════
     const studentLoginBox  = document.getElementById('student-login-box');
     const studentSignupBox = document.getElementById('student-signup-box');
 
@@ -236,7 +351,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Student login
     document.getElementById('student-login-form')?.addEventListener('submit', async (e) => {
         e.preventDefault();
         const email    = document.getElementById('student-email').value.trim();
@@ -256,7 +370,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Student signup
     document.getElementById('student-signup-form')?.addEventListener('submit', async (e) => {
         e.preventDefault();
         const full_name        = document.getElementById('student-fullname').value.trim();
@@ -268,7 +381,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const data = await post(`${API.users}?action=register`, { full_name, email, password, confirm_password });
         if (data.success) {
-            // Auto-login after signup
             const login = await post(`${API.users}?action=login`, { email, password });
             if (login.success) {
                 setSession({ email: login.user.email, name: login.user.full_name, role: 'student', id: login.user.user_id });
@@ -281,9 +393,25 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // ════════════════════════════════════════════════════════
-    //  PAGE: admin_auth.html
-    // ════════════════════════════════════════════════════════
+    // ══════════════════════════════════════════════════════════
+    //  PAGE: admin_auth.html (FULLY FIXED with signup & invite)
+    // ══════════════════════════════════════════════════════════
+    const adminLoginBox  = document.getElementById('admin-login-box');
+    const adminSignupBox = document.getElementById('admin-signup-box');
+    if (adminLoginBox && adminSignupBox) {
+        document.getElementById('show-admin-signup')?.addEventListener('click', (e) => {
+            e.preventDefault();
+            adminLoginBox.style.display = 'none';
+            adminSignupBox.style.display = 'block';
+        });
+        document.getElementById('show-admin-login')?.addEventListener('click', (e) => {
+            e.preventDefault();
+            adminSignupBox.style.display = 'none';
+            adminLoginBox.style.display = 'block';
+        });
+    }
+
+    // Admin Login (with role check)
     document.getElementById('admin-login-form')?.addEventListener('submit', async (e) => {
         e.preventDefault();
         const email = document.getElementById('admin-email').value.trim();
@@ -291,28 +419,78 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const data = await post(`${API.users}?action=login`, { email, password });
 
-       if (data.success && data.user.role === 'admin') {
-        setSession({ 
-            email: data.user.email, 
-            name: data.user.full_name, 
-            role: 'admin', 
-            id: data.user.user_id 
-        });
-        showAlert(`Welcome back, ${data.user.full_name}!`, () => {
-            window.location.href = 'admin_dashboard.html';
-        });
+        if (data.success && data.user.role === 'admin') {
+            setSession({ 
+                email: data.user.email, 
+                name: data.user.full_name, 
+                role: 'admin', 
+                id: data.user.user_id 
+            });
+            showAlert(`Welcome back, ${data.user.full_name}!`, () => {
+                window.location.href = 'admin_dashboard.html';
+            });
         } else if (data.success && data.user.role !== 'admin') {
-        showAlert('Access Denied: Admins only.');
+            showAlert('Access Denied: Admins only.');
         } else {
-        showAlert(data.message || 'Invalid credentials.');
-      }
+            showAlert(data.message || 'Invalid credentials.');
+        }
     });
 
-    // ════════════════════════════════════════════════════════
-    //  PAGE: admin_dashboard.html
-    // ════════════════════════════════════════════════════════
+    // Admin Signup with Invite Token (fully taken from old script)
+    document.getElementById('admin-signup-form')?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const full_name     = document.getElementById('admin-fullname').value.trim();
+        const email         = document.getElementById('admin-reg-email').value.trim();
+        const password      = document.getElementById('admin-reg-password').value;
+        const confirm_password = document.getElementById('admin-confirm-password').value;
+        const invite_token  = document.getElementById('admin-invite-token').value.trim();
+
+        if (!full_name || !email || !password || !invite_token) {
+            showAlert('All fields are required, including invite token.');
+            return;
+        }
+
+        const reg = await post(`${API.users}?action=registerAdmin`, { 
+            full_name, email, password, confirm_password, invite_token 
+        });
+
+        if (reg.success) {
+            // Auto-login after successful signup
+            const login = await post(`${API.users}?action=login`, { email, password });
+            if (login.success) {
+                setSession({ 
+                    email: login.user.email, 
+                    name: login.user.full_name, 
+                    role: 'admin', 
+                    id: login.user.user_id 
+                });
+            }
+            showAlert('Admin account created!', () => {
+                window.location.href = 'admin_dashboard.html';
+            });
+        } else {
+            showAlert(reg.message || 'Registration failed. Check invite token or contact main admin.');
+        }
+    });
+
+    // ══════════════════════════════════════════════════════════
+    //  PAGE: admin_dashboard.html (with invite token generator)
+    // ══════════════════════════════════════════════════════════
     if (page === 'admin_dashboard.html') {
         loadAdminDashboard();
+        
+        // Generate invite token button (from old script)
+        const generateBtn = document.getElementById('generate-invite-btn');
+        if (generateBtn) {
+            generateBtn.addEventListener('click', async () => {
+                const res = await post(`${API.users}?action=generateInvite`);
+                if (res.success) {
+                    showAlert(`Invite token (valid 24h):\n\n${res.token}`);
+                } else {
+                    showAlert(res.message || 'Could not generate token.');
+                }
+            });
+        }
     }
 
     async function loadAdminDashboard() {
@@ -325,16 +503,19 @@ document.addEventListener('DOMContentLoaded', () => {
             const items = itemsRes.data;
             const delivered = items.filter(i => i.status === 'delivered').length;
             const totalFound = items.length;
-            document.getElementById('delivered-count').textContent = delivered;
-            document.getElementById('total-found-count').textContent = totalFound;
+            const deliveredElem = document.getElementById('delivered-count');
+            const totalFoundElem = document.getElementById('total-found-count');
+            if (deliveredElem) deliveredElem.textContent = delivered;
+            if (totalFoundElem) totalFoundElem.textContent = totalFound;
         }
 
         if (claimsRes.success) {
             const pending = claimsRes.data.filter(c => c.status === 'pending').length;
-            document.getElementById('pending-claims-count').textContent = pending;
+            const pendingElem = document.getElementById('pending-claims-count');
+            if (pendingElem) pendingElem.textContent = pending;
 
             // Render recent pending claims in the table
-            const tbody   = document.querySelector('.data-table tbody');
+            const tbody = document.querySelector('.data-table tbody');
             const pending_claims = claimsRes.data.filter(c => c.status === 'pending').slice(0, 5);
             if (tbody && pending_claims.length) {
                 tbody.innerHTML = pending_claims.map(c => `
@@ -349,16 +530,16 @@ document.addEventListener('DOMContentLoaded', () => {
                             </div>
                         </td>
                     </tr>`).join('');
-                attachClaimButtons(tbody);
+                attachClaimButtons(tbody, loadAdminDashboard);
             } else if (tbody) {
                 tbody.innerHTML = '<tr><td colspan="4" style="color:#888;text-align:center;">No pending claims.</td></tr>';
             }
         }
     }
 
-    // ════════════════════════════════════════════════════════
-    //  PAGE: manage_items.html
-    // ════════════════════════════════════════════════════════
+    // ══════════════════════════════════════════════════════════
+    //  PAGE: manage_items.html (unchanged)
+    // ══════════════════════════════════════════════════════════
     if (page === 'manage_items.html') {
         loadManageItems();
     }
@@ -391,7 +572,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 </td>
             </tr>`).join('');
 
-        // Delete buttons
         tbody.querySelectorAll('.delete-item-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 e.preventDefault();
@@ -403,7 +583,6 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
 
-        // Edit buttons – prefill the form
         tbody.querySelectorAll('.edit-item-btn').forEach(btn => {
             btn.addEventListener('click', async (e) => {
                 e.preventDefault();
@@ -417,7 +596,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 document.getElementById('location').value     = item.location_found;
                 document.getElementById('description').value  = item.description || '';
 
-                // Switch form to update mode
                 const form = document.getElementById('add-item-form');
                 form.dataset.editId = id;
                 form.querySelector('button[type="submit"]').textContent = 'Update Item';
@@ -425,7 +603,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Add / update item form
     document.getElementById('add-item-form')?.addEventListener('submit', async (e) => {
         e.preventDefault();
         const form       = e.target;
@@ -466,9 +643,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // ════════════════════════════════════════════════════════
+    // ══════════════════════════════════════════════════════════
     //  PAGE: manage_claims.html
-    // ════════════════════════════════════════════════════════
+    // ══════════════════════════════════════════════════════════
     if (page === 'manage_claims.html') {
         loadManageClaims();
     }
@@ -486,73 +663,29 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         tbody.innerHTML = res.data.map(c => {
-        const actions = c.status === 'pending'
-            ? `<a href="#" class="status-badge status-green approve-btn" data-id="${c.claim_id}">Approve</a>
-               <a href="#" class="status-badge status-red reject-btn" data-id="${c.claim_id}">Reject</a>`
-            : `<span style="color:#888;">Done</span>`;
+            const actions = c.status === 'pending'
+                ? `<a href="#" class="status-badge status-green approve-btn" data-id="${c.claim_id}">Approve</a>
+                   <a href="#" class="status-badge status-red reject-btn" data-id="${c.claim_id}">Reject</a>`
+                : `<span style="color:#888;">Done</span>`;
+            return `
+                <tr>
+                    <td data-label="Student">${escHtml(c.student_name)}</td>
+                    <td data-label="Item">${escHtml(c.item_name)}</td>
+                    <td data-label="Date">${formatDate(c.submitted_at)}</td>
+                    <td data-label="Proof">
+                        <a href="#" class="status-badge status-teal view-proof-btn" data-proof="${escHtml(c.proof_details || 'No proof provided')}">View</a>
+                    </td>
+                    <td data-label="Status"><span class="status-badge ${claimStatusClass(c.status)}">${cap(c.status)}</span></td>
+                    <td data-label="Action"><div class="admin-actions">${actions}</div></td>
+                </tr>`;
+        }).join('');
 
-        return `
-            <tr>
-                <td data-label="Student">${escHtml(c.student_name)}</td>
-                <td data-label="Item">${escHtml(c.item_name)}</td>
-                <td data-label="Date">${formatDate(c.submitted_at)}</td>
-                <td data-label="Proof">
-                    <a href="#" class="status-badge status-teal view-proof-btn" data-proof="${escHtml(c.proof_details || 'No proof provided')}">View</a>
-                </td>
-                <td data-label="Status"><span class="status-badge ${claimStatusClass(c.status)}">${cap(c.status)}</span></td>
-                <td data-label="Action"><div class="admin-actions">${actions}</div></td>
-            </tr>
-        `;
-    }).join('');
-
-        attachClaimButtons(tbody);
+        attachClaimButtons(tbody, loadManageClaims);
     }
 
-    function attachClaimButtons(container) {
-        const user = getSession();
-        container.querySelectorAll('.view-proof-btn').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            e.preventDefault();
-            showAlert(btn.dataset.proof);
-        });
-    });
-
-        container.querySelectorAll('.approve-btn').forEach(btn => {
-            btn.addEventListener('click', async (e) => {
-                e.preventDefault();
-                showConfirm('Approve this claim?', async () => {
-                    const res = await post(`${API.claims}?action=review&id=${btn.dataset.id}`, {
-                        status: 'approved',
-                        reviewed_by: user?.id,
-                    });
-                    showAlert(res.message, () => {
-                        if (page === 'manage_claims.html') loadManageClaims();
-                        else loadAdminDashboard();
-                    });
-                });
-            });
-        });
-
-        container.querySelectorAll('.reject-btn').forEach(btn => {
-            btn.addEventListener('click', async (e) => {
-                e.preventDefault();
-                showConfirm('Reject this claim?', async () => {
-                    const res = await post(`${API.claims}?action=review&id=${btn.dataset.id}`, {
-                        status: 'rejected',
-                        reviewed_by: user?.id,
-                    });
-                    showAlert(res.message, () => {
-                        if (page === 'manage_claims.html') loadManageClaims();
-                        else loadAdminDashboard();
-                    });
-                });
-            });
-        });
-    }
-
-    // ════════════════════════════════════════════════════════
+    // ══════════════════════════════════════════════════════════
     //  PAGE: found_items.html
-    // ════════════════════════════════════════════════════════
+    // ══════════════════════════════════════════════════════════
     if (page === 'found_items.html') {
         loadFoundItems();
     }
@@ -583,7 +716,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
             </div>`).join('');
 
-        // Claim buttons
         grid.querySelectorAll('.claim-btn').forEach(btn => {
             btn.addEventListener('click', async (e) => {
                 e.preventDefault();
@@ -598,16 +730,19 @@ document.addEventListener('DOMContentLoaded', () => {
                             proof_details: proof
                        });
                        showAlert(res.message);
-                       if (res.success) loadFoundItems();
+                       if (res.success) {
+                           loadFoundItems();
+                           updateStudentNotification();
+                       }
                     });
                 });
             });
         });
     }
 
-    // ════════════════════════════════════════════════════════
+    // ══════════════════════════════════════════════════════════
     //  PAGE: my_claims.html
-    // ════════════════════════════════════════════════════════
+    // ══════════════════════════════════════════════════════════
     if (page === 'my_claims.html') {
         loadMyClaims();
     }
@@ -635,12 +770,12 @@ document.addEventListener('DOMContentLoaded', () => {
                         ? `<span class="status-badge status-purple" title="${escHtml(c.proof_details)}" style="cursor:pointer;" onclick="showAlert('${escHtml(c.proof_details).replace(/'/g,'\\\'')}')">View</span>`
                         : '—'}
                 </td>
-            </table>`).join('');
+            </tr>`).join('');
     }
 
-    // ════════════════════════════════════════════════════════
+    // ══════════════════════════════════════════════════════════
     //  PAGE: report_item.html
-    // ════════════════════════════════════════════════════════
+    // ══════════════════════════════════════════════════════════
     document.getElementById('report-item-form')?.addEventListener('submit', async (e) => {
         e.preventDefault();
         const user        = getSession();
@@ -711,11 +846,12 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // ════════════════════════════════════════════════════════
+    // ══════════════════════════════════════════════════════════
     //  PAGE: Student_dashboard.html
-    // ════════════════════════════════════════════════════════
+    // ══════════════════════════════════════════════════════════
     if (page === 'Student_dashboard.html') {
         loadStudentDashboard();
+        loadRecentFoundItems();
     }
 
     async function loadStudentDashboard() {
@@ -728,33 +864,33 @@ document.addEventListener('DOMContentLoaded', () => {
             get(`${API.foundItems}?action=getAll`),
         ]);
 
-        // Active Reports (pending)
         if (reportsRes.success) {
             const pendingReports = reportsRes.data.filter(r => r.status === 'pending').length;
-            document.getElementById('active-reports-count').textContent = pendingReports;
+            const activeElem = document.getElementById('active-reports-count');
+            if (activeElem) activeElem.textContent = pendingReports;
         }
 
-        // Total Reunited (delivered items)
         if (itemsRes.success) {
             const deliveredItems = itemsRes.data.filter(i => i.status === 'delivered').length;
-            document.getElementById('total-reunited-count').textContent = deliveredItems;
+            const reunitedElem = document.getElementById('total-reunited-count');
+            if (reunitedElem) reunitedElem.textContent = deliveredItems;
         }
 
-        // My Claims
         if (claimsRes.success) {
-            document.getElementById('my-claims-count').textContent = claimsRes.data.length;
+            const claimsElem = document.getElementById('my-claims-count');
+            if (claimsElem) claimsElem.textContent = claimsRes.data.length;
         }
 
-        // Items Available
         if (itemsRes.success) {
             const availableItems = itemsRes.data.filter(i => i.status === 'available').length;
-            document.getElementById('items-available-count').textContent = availableItems;
+            const availableElem = document.getElementById('items-available-count');
+            if (availableElem) availableElem.textContent = availableItems;
         }
     }
 
-    // ════════════════════════════════════════════════════════
+    // ══════════════════════════════════════════════════════════
     //  PAGE: manage_lost_reports.html (Admin view)
-    // ════════════════════════════════════════════════════════
+    // ══════════════════════════════════════════════════════════
     if (page === 'manage_lost_reports.html') {
         loadAllLostReports();
     }
@@ -798,7 +934,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 </tr>`;
         }).join('');
 
-        // Attach event listeners for status update buttons
         tbody.querySelectorAll('.mark-found-btn').forEach(btn => {
             btn.addEventListener('click', async (e) => {
                 e.preventDefault();
@@ -820,116 +955,43 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // ════════════════════════════════════════════════════════
-    //  UTILITY FUNCTIONS
-    // ════════════════════════════════════════════════════════
+    // ── Load recent found items for student dashboard ─────────
+    async function loadRecentFoundItems() {
+        const grid = document.getElementById('recent-items-grid');
+        const noMessage = document.getElementById('no-items-message');
+        
+        if (!grid || !noMessage) return;
 
-    function escHtml(str) {
-        return String(str ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+        const res = await get(`${API.foundItems}?action=getRecent`);
+        
+        if (res.success && res.data && res.data.length > 0) {
+            noMessage.style.display = 'none';
+            grid.innerHTML = '';
+            
+            res.data.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'recent-card';
+                
+                const itemName = escHtml(item.item_name);
+                const location = escHtml(item.location_found);
+                const date     = formatDate(item.date_found);
+                
+                card.innerHTML = `
+                    <div>
+                        <h4>${itemName}</h4>
+                        <div class="meta">${location} - ${date}</div>
+                    </div>
+                    <div class="actions">
+                        <a href="found_items.html?claim_id=${item.item_id}">Claim it</a>
+                        <a href="found_items.html?detail_id=${item.item_id}">Details</a>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        } else {
+            noMessage.style.display = 'block';
+            grid.innerHTML = '';
+        }
     }
-
-    function formatDate(dateStr) {
-        if (!dateStr) return '—';
-        const d = new Date(dateStr);
-        return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
-    }
-
-    function cap(str) {
-        return str ? str.charAt(0).toUpperCase() + str.slice(1) : '';
-    }
-
-    function statusClass(status) {
-        return { available: 'status-green', claimed: 'status-under-review', delivered: 'status-approved' }[status] || '';
-    }
-
-    function claimStatusClass(status) {
-        return { pending: 'status-under-review', approved: 'status-approved', rejected: 'status-rejected' }[status] || '';
-    }
-
-    function claimStatusLabel(status) {
-        return { pending: 'Pending Review', approved: 'Approved', rejected: 'Rejected' }[status] || cap(status);
-    }
-
-    function reportStatusClass(status) {
-        return { pending: 'status-under-review', found: 'status-approved', closed: 'status-red' }[status] || '';
-    }
-
-loadRecentFoundItems();
 
 }); // end DOMContentLoaded
-
-// update admin badge
-async function updateAdminNotification() {
-    const badge = document.getElementById('admin-claims-badge');
-    if (!badge) return;
-
-    const res = await get(`${API.claims}?action=getAll`);
-    if (res.success && res.data) {
-        const pendingCount = res.data.filter(c => c.status === 'pending').length;
-        if (pendingCount > 0) {
-            badge.innerText = pendingCount;
-            badge.style.display = 'inline-block';
-        } else {
-            badge.style.display = 'none';
-        }
-    }
-}
-
-// update student badge
-async function updateStudentNotification() {
-    const badge = document.getElementById('student-claims-badge');
-    if (!badge) return;
-
-    const user = getSession();
-    if (!user) return;
-
-    const res = await get(`${API.claims}?action=getByStudent&student_id=${user.id}`);
-    if (res.success && res.data) {
-        const updatedCount = res.data.filter(c => c.status !== 'pending').length;
-        if (updatedCount > 0) {
-            badge.innerText = updatedCount;
-            badge.style.display = 'inline-block';
-        } else {
-            badge.style.display = 'none';
-        }
-    }
-}
-
-
-async function loadRecentFoundItems() {
-    const grid = document.getElementById('recent-items-grid');
-    const noMessage = document.getElementById('no-items-message');
-    
-    if (!grid || !noMessage) return;
-
-    const res = await get(`${API.foundItems}?action=getRecent`);
-    
-    if (res.success && res.data && res.data.length > 0) {
-        noMessage.style.display = 'none';
-        grid.innerHTML = '';
-        
-        res.data.forEach(item => {
-            const card = document.createElement('div');
-            card.className = 'recent-card';
-            
-            const itemName = escHtml(item.item_name);
-            const location = escHtml(item.location_found);
-            const date     = formatDate(item.date_found);
-            
-            card.innerHTML = `
-                <div>
-                    <h4>${itemName}</h4>
-                    <div class="meta">${location} - ${date}</div>
-                </div>
-                <div class="actions">
-                    <a href="found_items.html?claim_id=${item.item_id}">Claim it</a>
-                    <a href="found_items.html?detail_id=${item.item_id}">Details</a>
-                </div>
-            `;
-            grid.appendChild(card);
-        });
-    } else {
-        noMessage.style.display = 'block';
-        grid.innerHTML = '';
-    }
-}

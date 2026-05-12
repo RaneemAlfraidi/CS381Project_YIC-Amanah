@@ -1,289 +1,216 @@
 <?php
 // ============================================================
-//  YIC Amanah – Users CRUD
-//  File: api/users.php
-//
-//  Endpoints:
-//    POST ?action=register          – student self-registration
-//    POST ?action=login             – student or admin login
-//    GET  ?action=getAll            – admin: list all users
-//    GET  ?action=getOne&id=3       – get one user profile
-//    POST ?action=update&id=3       – update name / email
-//    POST ?action=delete&id=3       – admin: delete a user
-//    POST ?action=changePassword&id=3
+//  YIC Amanah – Users API (invite‑token admin registration)
 // ============================================================
+
 session_start();
 require_once '../config/db.php';
-
 header('Content-Type: application/json');
 
 $action = $_GET['action'] ?? '';
 
 switch ($action) {
-    case 'register':
-        registerUser();
-        break;
-
-    case 'login':
-        loginUser();
-        break;
-
-    case 'getAll':
-        getAllUsers();
-        break;
-
-    case 'getOne':
-        $id = (int)($_GET['id'] ?? 0);
-        getOneUser($id);
-        break;
-
-    case 'update':
-        $id = (int)($_GET['id'] ?? 0);
-        updateUser($id);
-        break;
-
-    case 'delete':
-        $id = (int)($_GET['id'] ?? 0);
-        deleteUser($id);
-        break;
-
-    case 'changePassword':
-        $id = (int)($_GET['id'] ?? 0);
-        changePassword($id);
-        break;
-
-    case 'logout':
-        logoutUser();
-        break;
-
+    case 'register':        registerUser();               break;
+    case 'registerAdmin':   registerAdmin();              break;
+    case 'login':           loginUser();                  break;
+    case 'logout':          logoutUser();                 break;
+    case 'getAll':          getAllUsers();                break;
+    case 'getOne':          getOneUser((int)($_GET['id'] ?? 0)); break;
+    case 'update':          updateUser((int)($_GET['id'] ?? 0)); break;
+    case 'delete':          deleteUser((int)($_GET['id'] ?? 0)); break;
+    case 'changePassword':  changePassword((int)($_GET['id'] ?? 0)); break;
+    case 'generateInvite':  generateInvite();             break;
     default:
         echo json_encode(['success' => false, 'message' => 'Invalid action.']);
-        break;
 }
 
+// ---------- helpers ----------
+function respond($success, $message, $extra = []) {
+    echo json_encode(array_merge(['success' => $success, 'message' => $message], $extra));
+    exit;
+}
 
-// ============================================================
-// FUNCTIONS
-// ============================================================
+function validatePassword($pass, $confirm) {
+    if (strlen($pass) < 6) return 'Password must be at least 6 characters.';
+    if (!preg_match('/[a-zA-Z]/', $pass) || !preg_match('/[0-9]/', $pass))
+        return 'Password must contain both letters and numbers.';
+    if ($pass !== $confirm) return 'Passwords do not match.';
+    return '';
+}
 
-function registerUser(): void {
-    $full_name = trim($_POST['full_name'] ?? '');
-    $email     = strtolower(trim($_POST['email'] ?? ''));
-    $password  = $_POST['password'] ?? '';
-    $confirm   = $_POST['confirm_password'] ?? '';
+function emailTaken($pdo, $email, $excludeId = 0) {
+    $sql = "SELECT user_id FROM users WHERE email = :email";
+    if ($excludeId) $sql .= " AND user_id != :id";
+    $stmt = $pdo->prepare($sql);
+    $params = [':email' => $email];
+    if ($excludeId) $params[':id'] = $excludeId;
+    $stmt->execute($params);
+    return (bool)$stmt->fetch();
+}
 
-    // Validation
-    if (!$full_name || !$email || !$password) {
-        echo json_encode(['success' => false, 'message' => 'All fields are required.']);
-        return;
-    }
-    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        echo json_encode(['success' => false, 'message' => 'Invalid email address.']);
-        return;
-    }
-    if (strlen($password) < 4) {
-        echo json_encode(['success' => false, 'message' => 'Password must be at least 4 characters.']);
-        return;
-    }
-    if (!preg_match('/[a-zA-Z]/', $password) || !preg_match('/[0-9]/', $password)) {
-        echo json_encode(['success' => false, 'message' => 'Password must contain both letters and numbers.']);
-        return;
-    }
-    if ($password !== $confirm) {
-        echo json_encode(['success' => false, 'message' => 'Passwords do not match.']);
-        return;
-    }
+function insertUser($pdo, $name, $email, $password, $role) {
+    $stmt = $pdo->prepare("INSERT INTO users (full_name, email, password, role) VALUES (?, ?, ?, ?)");
+    $stmt->execute([$name, $email, password_hash($password, PASSWORD_BCRYPT), $role]);
+    return (int)$pdo->lastInsertId();
+}
+
+function ensureInviteTable($pdo) {
+    $pdo->exec("
+        CREATE TABLE IF NOT EXISTS admin_invites (
+            token      CHAR(64)  PRIMARY KEY,
+            created_by INT       NOT NULL,
+            used_by    INT       DEFAULT NULL,
+            expires_at DATETIME  NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (created_by) REFERENCES users(user_id) ON DELETE CASCADE,
+            FOREIGN KEY (used_by)    REFERENCES users(user_id) ON DELETE SET NULL
+        )
+    ");
+}
+
+// ---------- student registration ----------
+function registerUser() {
+    $name = trim($_POST['full_name'] ?? '');
+    $email = strtolower(trim($_POST['email'] ?? ''));
+    $pass = $_POST['password'] ?? '';
+    $confirm = $_POST['confirm_password'] ?? '';
+
+    if (!$name || !$email || !$pass) respond(false, 'All fields are required.');
+    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) respond(false, 'Invalid email.');
+    if ($err = validatePassword($pass, $confirm)) respond(false, $err);
 
     $pdo = getDB();
+    if (emailTaken($pdo, $email)) respond(false, 'Email already registered.');
 
-    // Check email not already used
-    $chk = $pdo->prepare("SELECT user_id FROM users WHERE email = :email");
-    $chk->execute([':email' => $email]);
-    if ($chk->fetch()) {
-        echo json_encode(['success' => false, 'message' => 'Email already registered.']);
-        return;
-    }
-
-    $hashed = password_hash($password, PASSWORD_BCRYPT);
-
-    $stmt = $pdo->prepare("
-        INSERT INTO users (full_name, email, password, role)
-        VALUES (:full_name, :email, :password, 'student')
-    ");
-    $stmt->execute([
-        ':full_name' => $full_name,
-        ':email'     => $email,
-        ':password'  => $hashed,
-    ]);
-
-    echo json_encode([
-        'success' => true,
-        'message' => 'Account created successfully.',
-        'user_id' => (int)$pdo->lastInsertId(),
-    ]);
+    $id = insertUser($pdo, $name, $email, $pass, 'student');
+    respond(true, 'Account created successfully.', ['user_id' => $id]);
 }
 
+// ---------- admin invite ----------
+function generateInvite() {
+    if (empty($_SESSION['role']) || $_SESSION['role'] !== 'admin')
+        respond(false, 'Admin authentication required.');
 
-function loginUser(): void {
-    $email    = strtolower(trim($_POST['email']    ?? ''));
-    $password = $_POST['password'] ?? '';
+    $pdo = getDB();
+    ensureInviteTable($pdo);
 
-    if (!$email || !$password) {
-        echo json_encode(['success' => false, 'message' => 'Email and password are required.']);
-        return;
-    }
+    $token = bin2hex(random_bytes(32));
+    $expires = date('Y-m-d H:i:s', strtotime('+24 hours'));
 
-    $pdo  = getDB();
-    $stmt = $pdo->prepare("SELECT * FROM users WHERE email = :email");
-    $stmt->execute([':email' => $email]);
+    $pdo->prepare("INSERT INTO admin_invites (token, created_by, expires_at) VALUES (?, ?, ?)")
+        ->execute([$token, $_SESSION['user_id'], $expires]);
+
+    respond(true, 'Invite token generated (valid 24h).', ['token' => $token, 'expires_at' => $expires]);
+}
+
+function registerAdmin() {
+    $name = trim($_POST['full_name'] ?? '');
+    $email = strtolower(trim($_POST['email'] ?? ''));
+    $pass = $_POST['password'] ?? '';
+    $confirm = $_POST['confirm_password'] ?? '';
+    $token = trim($_POST['invite_token'] ?? '');
+
+    if (!$name || !$email || !$pass || !$token) respond(false, 'All fields including token required.');
+    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) respond(false, 'Invalid email.');
+    if ($err = validatePassword($pass, $confirm)) respond(false, $err);
+
+    $pdo = getDB();
+    ensureInviteTable($pdo);
+
+    $stmt = $pdo->prepare("SELECT * FROM admin_invites WHERE token = ? AND used_by IS NULL AND expires_at > NOW()");
+    $stmt->execute([$token]);
+    $invite = $stmt->fetch();
+    if (!$invite) respond(false, 'Invalid, expired, or already used invite token.');
+    if (emailTaken($pdo, $email)) respond(false, 'Email already registered.');
+
+    $newId = insertUser($pdo, $name, $email, $pass, 'admin');
+    $pdo->prepare("UPDATE admin_invites SET used_by = ? WHERE token = ?")->execute([$newId, $token]);
+
+    respond(true, 'Admin account created successfully.', ['user_id' => $newId]);
+}
+
+// ---------- login / logout ----------
+function loginUser() {
+    $email = strtolower(trim($_POST['email'] ?? ''));
+    $pass = $_POST['password'] ?? '';
+    if (!$email || !$pass) respond(false, 'Email and password required.');
+
+    $pdo = getDB();
+    $stmt = $pdo->prepare("SELECT * FROM users WHERE email = ?");
+    $stmt->execute([$email]);
     $user = $stmt->fetch();
 
-    // Use password_verify to compare against hashed passwords
-    // For the seeded admin rows (which have placeholder hashes) you would
-    // update their passwords via changePassword() before going live.
-    if ($user && password_verify($password, $user['password'])) {
+    if ($user && password_verify($pass, $user['password'])) {
         $_SESSION['user_id'] = $user['user_id'];
-        $_SESSION['role']    = $user['role'];
-        // Don't return the hashed password to the client
+        $_SESSION['role'] = $user['role'];
         unset($user['password']);
-        echo json_encode(['success' => true, 'message' => 'Login successful.', 'user' => $user]);
+        respond(true, 'Login successful.', ['user' => $user]);
     } else {
-        echo json_encode(['success' => false, 'message' => 'Invalid credentials.']);
+        respond(false, 'Invalid credentials.');
     }
 }
 
-
-function getAllUsers(): void {
-    $pdo  = getDB();
-    $stmt = $pdo->prepare("
-        SELECT user_id, full_name, email, role, created_at
-        FROM   users
-        ORDER  BY created_at DESC
-    ");
-    $stmt->execute();
-    echo json_encode(['success' => true, 'data' => $stmt->fetchAll()]);
+function logoutUser() {
+    session_destroy();
+    respond(true, 'Logged out successfully.');
 }
 
+// ---------- user CRUD ----------
+function getAllUsers() {
+    $pdo = getDB();
+    $stmt = $pdo->query("SELECT user_id, full_name, email, role, created_at FROM users ORDER BY created_at DESC");
+    respond(true, '', ['data' => $stmt->fetchAll()]);
+}
 
-function getOneUser(int $id): void {
-    if ($id <= 0) {
-        echo json_encode(['success' => false, 'message' => 'Invalid user ID.']);
-        return;
-    }
-
-    $pdo  = getDB();
-    $stmt = $pdo->prepare("
-        SELECT user_id, full_name, email, role, created_at
-        FROM   users
-        WHERE  user_id = :id
-    ");
-    $stmt->execute([':id' => $id]);
+function getOneUser($id) {
+    if ($id <= 0) respond(false, 'Invalid user ID.');
+    $pdo = getDB();
+    $stmt = $pdo->prepare("SELECT user_id, full_name, email, role, created_at FROM users WHERE user_id = ?");
+    $stmt->execute([$id]);
     $user = $stmt->fetch();
-
-    if ($user) {
-        echo json_encode(['success' => true, 'data' => $user]);
-    } else {
-        echo json_encode(['success' => false, 'message' => 'User not found.']);
-    }
+    if ($user) respond(true, '', ['data' => $user]);
+    else respond(false, 'User not found.');
 }
 
-
-function updateUser(int $id): void {
-    if ($id <= 0) {
-        echo json_encode(['success' => false, 'message' => 'Invalid user ID.']);
-        return;
-    }
-
-    $full_name = trim($_POST['full_name'] ?? '');
-    $email     = strtolower(trim($_POST['email'] ?? ''));
-
-    if (!$full_name || !$email) {
-        echo json_encode(['success' => false, 'message' => 'Name and email are required.']);
-        return;
-    }
-    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        echo json_encode(['success' => false, 'message' => 'Invalid email address.']);
-        return;
-    }
+function updateUser($id) {
+    if ($id <= 0) respond(false, 'Invalid user ID.');
+    $name = trim($_POST['full_name'] ?? '');
+    $email = strtolower(trim($_POST['email'] ?? ''));
+    if (!$name || !$email) respond(false, 'Name and email required.');
+    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) respond(false, 'Invalid email.');
 
     $pdo = getDB();
-
-    // Ensure the new email is not taken by someone else
-    $chk = $pdo->prepare("SELECT user_id FROM users WHERE email = :email AND user_id != :id");
-    $chk->execute([':email' => $email, ':id' => $id]);
-    if ($chk->fetch()) {
-        echo json_encode(['success' => false, 'message' => 'Email already used by another account.']);
-        return;
-    }
-
-    $stmt = $pdo->prepare("
-        UPDATE users SET full_name = :full_name, email = :email WHERE user_id = :id
-    ");
-    $stmt->execute([':full_name' => $full_name, ':email' => $email, ':id' => $id]);
-
-    echo json_encode(['success' => true, 'message' => 'Profile updated.']);
+    if (emailTaken($pdo, $email, $id)) respond(false, 'Email already used by another account.');
+    $pdo->prepare("UPDATE users SET full_name = ?, email = ? WHERE user_id = ?")->execute([$name, $email, $id]);
+    respond(true, 'Profile updated.');
 }
 
-
-function deleteUser(int $id): void {
-    if ($id <= 0) {
-        echo json_encode(['success' => false, 'message' => 'Invalid user ID.']);
-        return;
-    }
-
-    $pdo  = getDB();
-    $stmt = $pdo->prepare("DELETE FROM users WHERE user_id = :id");
-    $stmt->execute([':id' => $id]);
-
-    if ($stmt->rowCount() > 0) {
-        echo json_encode(['success' => true, 'message' => 'User deleted.']);
-    } else {
-        echo json_encode(['success' => false, 'message' => 'User not found.']);
-    }
+function deleteUser($id) {
+    if ($id <= 0) respond(false, 'Invalid user ID.');
+    $pdo = getDB();
+    $stmt = $pdo->prepare("DELETE FROM users WHERE user_id = ?");
+    $stmt->execute([$id]);
+    if ($stmt->rowCount()) respond(true, 'User deleted.');
+    else respond(false, 'User not found.');
 }
 
+function changePassword($id) {
+    if ($id <= 0) respond(false, 'Invalid user ID.');
+    $current = $_POST['current_password'] ?? '';
+    $new = $_POST['new_password'] ?? '';
+    $confirm = $_POST['confirm_password'] ?? '';
+    if (!$current || !$new || !$confirm) respond(false, 'All password fields required.');
+    if ($err = validatePassword($new, $confirm)) respond(false, $err);
 
-function changePassword(int $id): void {
-    if ($id <= 0) {
-        echo json_encode(['success' => false, 'message' => 'Invalid user ID.']);
-        return;
-    }
-
-    $current  = $_POST['current_password']  ?? '';
-    $new_pass = $_POST['new_password']      ?? '';
-    $confirm  = $_POST['confirm_password']  ?? '';
-
-    if (!$current || !$new_pass || !$confirm) {
-        echo json_encode(['success' => false, 'message' => 'All password fields are required.']);
-        return;
-    }
-    if ($new_pass !== $confirm) {
-        echo json_encode(['success' => false, 'message' => 'New passwords do not match.']);
-        return;
-    }
-    if (strlen($new_pass) < 4) {
-        echo json_encode(['success' => false, 'message' => 'Password must be at least 4 characters.']);
-        return;
-    }
-
-    $pdo  = getDB();
-    $stmt = $pdo->prepare("SELECT password FROM users WHERE user_id = :id");
-    $stmt->execute([':id' => $id]);
+    $pdo = getDB();
+    $stmt = $pdo->prepare("SELECT password FROM users WHERE user_id = ?");
+    $stmt->execute([$id]);
     $user = $stmt->fetch();
+    if (!$user || !password_verify($current, $user['password']))
+        respond(false, 'Current password is incorrect.');
 
-    if (!$user || !password_verify($current, $user['password'])) {
-        echo json_encode(['success' => false, 'message' => 'Current password is incorrect.']);
-        return;
-    }
-
-    function logoutUser() {
-      session_destroy();
-      echo json_encode(['success' => true, 'message' => 'Logged out successfully.']);
-    }
-
-    $hashed = password_hash($new_pass, PASSWORD_BCRYPT);
-    $upd    = $pdo->prepare("UPDATE users SET password = :pw WHERE user_id = :id");
-    $upd->execute([':pw' => $hashed, ':id' => $id]);
-
-    echo json_encode(['success' => true, 'message' => 'Password changed successfully.']);
+    $pdo->prepare("UPDATE users SET password = ? WHERE user_id = ?")
+        ->execute([password_hash($new, PASSWORD_BCRYPT), $id]);
+    respond(true, 'Password changed successfully.');
 }
+?>

@@ -10,11 +10,12 @@
 <body>
     <a href="Index.html" class="return-home-icon"><i class="fas fa-home"></i></a>
 
-    <div class="auth-container">
+    <!-- Admin Login Box -->
+    <div class="auth-container" id="admin-login-box">
         <div class="auth-header">
             <img src="../assets/media/logo.svg" alt="YIC Amanah Logo" width="200" height="150">
             <h2>Admin Log in</h2>
-            <p style="font-size: 0.85rem; color: #aaa;">Use your official admin credentials</p>
+            <p style="font-size:0.85rem; color:#aaa;">Use your official admin credentials</p>
         </div>
         <form id="admin-login-form">
             <div class="form-group">
@@ -29,6 +30,48 @@
                 <button type="submit" class="btn-auth">Log in as Admin</button>
             </div>
         </form>
+        <div class="switch-auth">
+            Have an invite token?
+            <a href="#" id="show-admin-signup">Register as Admin</a>
+        </div>
+    </div>
+
+    <!-- Admin Register Box -->
+    <div class="auth-container" id="admin-signup-box" style="display:none;">
+        <div class="auth-header">
+            <img src="../assets/media/logo.svg" alt="YIC Amanah Logo" width="200" height="150">
+            <h2>Create Admin Account</h2>
+            <p style="font-size:0.85rem; color:#aaa;">You need a one‑time invite token from an existing admin.</p>
+        </div>
+        <form id="admin-signup-form">
+            <div class="form-group">
+                <label for="admin-fullname">Full Name:</label>
+                <input type="text" id="admin-fullname" required>
+            </div>
+            <div class="form-group">
+                <label for="admin-reg-email">Email:</label>
+                <input type="email" id="admin-reg-email" required>
+            </div>
+            <div class="form-group">
+                <label for="admin-reg-password">Password:</label>
+                <input type="password" id="admin-reg-password" required>
+            </div>
+            <div class="form-group">
+                <label for="admin-confirm-password">Confirm Password:</label>
+                <input type="password" id="admin-confirm-password" required>
+            </div>
+            <div class="form-group">
+                <label for="admin-invite-token">Invite Token:</label>
+                <input type="text" id="admin-invite-token" placeholder="Paste the token shared by an existing admin" required style="font-family:monospace;">
+            </div>
+            <div class="center-btn-wrapper">
+                <button type="submit" class="btn-auth">Create Admin Account</button>
+            </div>
+        </form>
+        <div class="switch-auth">
+            Already have an account?
+            <a href="#" id="show-admin-login">Login here</a>
+        </div>
     </div>
 
     <script src="../assets/javascript/script.js"></script>
