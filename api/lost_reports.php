@@ -1,22 +1,6 @@
 <?php
-// ============================================================
-//  YIC Amanah – Lost Reports CRUD
-//  File: api/lost_reports.php
-//
-//  Endpoints:
-//    GET  ?action=getAll                    – all reports (admin)
-//    GET  ?action=getByStudent&student_id=3 – reports for one student
-//    GET  ?action=getOne&id=2               – single report
-//    POST ?action=create                    – student submits a new report
-//    POST ?action=update&id=2               – student edits their report
-//    POST ?action=delete&id=2               – student / admin deletes a report
-//    POST ?action=updateStatus&id=2         – admin updates report status
-// ============================================================
-
 require_once '../config/db.php';
-
 header('Content-Type: application/json');
-
 $action = $_GET['action'] ?? '';
 
 switch ($action) {
@@ -57,12 +41,6 @@ switch ($action) {
         echo json_encode(['success' => false, 'message' => 'Invalid action.']);
         break;
 }
-
-
-// ============================================================
-// FUNCTIONS
-// ============================================================
-
 function getAllReports(): void {
     $pdo  = getDB();
     $stmt = $pdo->prepare("
