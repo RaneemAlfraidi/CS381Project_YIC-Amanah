@@ -1,21 +1,6 @@
 <?php
-// ============================================================
-//  YIC Amanah – Claims CRUD
-//  File: api/claims.php
-//
-//  Endpoints:
-//    GET  ?action=getAll                 – all claims (admin)
-//    GET  ?action=getByStudent&student_id=3
-//    GET  ?action=getOne&id=1
-//    POST ?action=create                 – student submits a claim
-//    POST ?action=review&id=1            – admin approves / rejects
-//    POST ?action=delete&id=1            – admin deletes a claim
-// ============================================================
-
 require_once '../config/db.php';
-
 header('Content-Type: application/json');
-
 $action = $_GET['action'] ?? '';
 
 switch ($action) {
@@ -51,12 +36,6 @@ switch ($action) {
         echo json_encode(['success' => false, 'message' => 'Invalid action.']);
         break;
 }
-
-
-// ============================================================
-// FUNCTIONS
-// ============================================================
-
 function getAllClaims(): void {
     $pdo  = getDB();
     $stmt = $pdo->prepare("
@@ -143,7 +122,6 @@ function createClaim(): void {
 
     $pdo = getDB();
 
-    // Check the item actually exists and is still available
     $check = $pdo->prepare("SELECT status FROM found_items WHERE item_id = :id");
     $check->execute([':id' => $item_id]);
     $item = $check->fetch();
@@ -157,7 +135,6 @@ function createClaim(): void {
         return;
     }
 
-    // Prevent a student from claiming the same item twice
     $dup = $pdo->prepare("
         SELECT claim_id FROM claims
         WHERE  student_id = :sid AND item_id = :iid AND status = 'pending'
@@ -203,7 +180,6 @@ function reviewClaim(int $id): void {
 
     $pdo = getDB();
 
-    // Update the claim
     $stmt = $pdo->prepare("
         UPDATE claims
         SET    status      = :status,
@@ -217,7 +193,6 @@ function reviewClaim(int $id): void {
         ':id'          => $id,
     ]);
 
-    // If approved, mark the linked found item as 'claimed'
     if ($status === 'approved') {
         $getItem = $pdo->prepare("SELECT item_id FROM claims WHERE claim_id = :id");
         $getItem->execute([':id' => $id]);
