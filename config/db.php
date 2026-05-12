@@ -1,19 +1,12 @@
 <?php
-// ============================================================
-//  YIC Amanah - Database Configuration
-//  File: config/db.php
-// ============================================================
 
 define('DB_HOST', 'localhost');
 define('DB_NAME', 'yic_amanah');
-define('DB_USER', 'root');         // change to your DB username
-define('DB_PASS', '');             // change to your DB password
+define('DB_USER', 'root');         
+define('DB_PASS', '');            
 define('DB_CHARSET', 'utf8mb4');
 
-/**
- * Returns a singleton PDO connection.
- * Usage: $pdo = getDB();
- */
+
 function getDB(): PDO {
     static $pdo = null;
 
@@ -29,7 +22,6 @@ function getDB(): PDO {
         try {
             $pdo = new PDO($dsn, DB_USER, DB_PASS, $options);
         } catch (PDOException $e) {
-            // In production, log this instead of echoing
             http_response_code(500);
             die(json_encode(['success' => false, 'message' => 'Database connection failed.']));
         }
