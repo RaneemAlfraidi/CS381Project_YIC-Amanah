@@ -342,7 +342,6 @@ button:hover, .btn-admin-primary:hover {
   --status-color: #f87171;
   --status-bg: #1f1212;
   --status-border: #7f1d1d; }
-  /* Fix for clickable action badges (Approve, Reject, Edit, Delete, etc.) */
 a.status-badge.status-green,
 a.status-badge.status-red,
 button.status-badge.status-green,
@@ -351,7 +350,6 @@ button.status-badge.status-red {
     cursor: pointer;
 }
 
-/* Keep non-interactive badges untouched */
 .status-badge.status-approved,
 .status-badge.status-rejected,
 .status-badge.status-under-review,
@@ -375,7 +373,7 @@ button.status-badge.status-red {
     pointer-events: auto;
 }
 
-.auth-page {                  /* Authentication section styling */
+.auth-page {                
   display: flex;
   align-items: center;
   justify-content: center;
@@ -398,14 +396,14 @@ button.status-badge.status-red {
 .auth-container h2 { margin-bottom: 20px; color: var(--auth-accent); }
 .switch-auth { margin-top: 15px; font-size: 14px; }
 .switch-auth a { color: var(--auth-accent); text-decoration: none; }
-.switch-auth a:hover { color: var(--auth-primary); text-decoration: underline; }  /* Hover effect for links */
+.switch-auth a:hover { color: var(--auth-primary); text-decoration: underline; } 
 .auth-container input:focus { border-color: var(--auth-accent); outline: none; }
 
 
-.sidebar.admin, .sidebar.student {         /* Admin and student sidebars */
+.sidebar.admin, .sidebar.student {         
     animation: smoothFloat 4s ease-in-out infinite; }
 .sidebar.admin nav a.active { color: var(--teal); background: #152424; }
-.sidebar.admin nav a::before {            /* Gradient effect for active navigation links */
+.sidebar.admin nav a::before {            
   background: linear-gradient(90deg, rgba(49, 151, 149, 0.15) 0%, transparent 100%);
   border-left: 3px solid var(--teal); }
 .sidebar.admin nav a:hover, .sidebar.admin nav a.active { 
@@ -414,18 +412,18 @@ button.status-badge.status-red {
   background: linear-gradient(135deg, var(--teal), var(--teal-dark)); }
 .data-table.admin-table th { color: var(--teal-dark); }
 
-.sidebar.student nav a.active { color: var(--purple-soft); background: #2a2139; }    /*Student Theme Overrides*/ 
+.sidebar.student nav a.active { color: var(--purple-soft); background: #2a2139; }    
 .sidebar.student nav a::before {
   background: linear-gradient(90deg, #a281e826 0%, transparent 100%);
   border-left: 3px solid var(--purple-soft); }
 
-@keyframes smoothFloat {          /*Animations*/
+@keyframes smoothFloat {          
   0%,
   100% { transform: translateY(0); }
-  50% { transform: translateY(-8px); } }      /* Move up slightly at 50% for floating effect */
+  50% { transform: translateY(-8px); } }     
 
-@media (max-width: 768px) {      /*Responsive Queries*/
-  .dashboard-container { flex-direction: column; }  /* Mobile view adjustments */
+@media (max-width: 768px) {     
+  .dashboard-container { flex-direction: column; }  
   .sidebar {
     position: relative;
     width: 100%;
@@ -437,7 +435,6 @@ button.status-badge.status-red {
     padding: 72px 16px 16px;
   }
 
-  /* Mobile: tables become vertical cards */
 @media (max-width: 768px) {
   .data-table, .data-table thead, .data-table tbody, .data-table th, .data-table td, .data-table tr {
     display: block;
@@ -473,18 +470,18 @@ button.status-badge.status-red {
 }
   .auth-page .auth-container { width: min(100%, 400px); }
   .data-table { width: 100%; table-layout: fixed; }
-  .data-table th, .data-table td {     /* Make table content smaller for phones */
+  .data-table th, .data-table td {    
     padding: 6px 4px; font-size: 12px; }
   .status-badge,.data-table a { 
     padding: 3px 6px !important; font-size: 11px; } }
 
-.home-wrapper {        /*Home page styles*/
+.home-wrapper {     
   display: flex;
   align-items: center;
   justify-content: center;
   height: 100vh;
   overflow: hidden; }
-.home-hero {           /* Layout for the main hero section */
+.home-hero {           
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -495,7 +492,7 @@ button.status-badge.status-red {
   text-align: center; }
 
 .hero-logo img { width: 180px; filter: drop-shadow(0 0 15px #a281e826);}
-.hero-text h1 {       /* Gradient color effect for the heading */
+.hero-text h1 {      
   margin-bottom: 0.8rem;
   font-size: 2.4rem;
   background: linear-gradient(135deg, var(--purple), var(--teal));
@@ -509,7 +506,7 @@ button.status-badge.status-red {
   gap: 24px;
   width: 100%;
   max-width: 850px; }
-.role-card {        /* Styling for the role selection cards */
+.role-card {      
   display: flex;
   flex: 1;
   flex-direction: column;
@@ -521,14 +518,14 @@ button.status-badge.status-red {
   border-radius: 24px;
   transition: 0.3s;}
 
-.role-card:hover {    /* Move card up slightly when hovered */
+.role-card:hover {   
   transform: translateY(-5px);
   background: rgba(35, 35, 35, 0.9);
   border-color: #a281e866; }
 .role-card.admin-card:hover { 
     border-color: #4fd1c599; }
 
-.icon-circle {       /* Circular background for the icons */
+.icon-circle {       
   display: flex;
   align-items: center;
   justify-content: center;
@@ -562,16 +559,16 @@ button.status-badge.status-red {
   border-radius: 20px;
   padding: 25px 20px;
   text-align: center;
-  max-width: 450px; /* Increased max-width to accommodate longer tokens */
+  max-width: 450px; 
   width: 90%;
   border: 1px solid #1b2a4e;
   box-shadow: 0 20px 35px rgba(0, 0, 0, 0.5);
-  word-wrap: break-word; /* Forces the long hash to wrap */
+  word-wrap: break-word; 
   overflow-wrap: break-word;
 }
 #alert-message {
-  white-space: pre-wrap; /* Preserves the line breaks from your JS */
-  word-break: break-all; /* Ensures the long hash breaks at any character to stay inside */
+  white-space: pre-wrap;
+  word-break: break-all; 
   color: #fff;
   margin-bottom: 20px;
   font-size: 0.95rem;
@@ -589,7 +586,6 @@ button.status-badge.status-red {
 .alert-content button:hover {
   background: #3b82f6; }
 
- /* Custom Prompt Box */
 .prompt-box { width: 90%; max-width: 400px; }
 
 .prompt-input {
@@ -611,7 +607,6 @@ button.status-badge.status-red {
 .prompt-btn-no  { 
   background-color: var(--danger); }
 
-  /* notification badges */
 .nav-badge {
     display: none;
     padding: 2px 7px;
@@ -631,7 +626,6 @@ button.status-badge.status-red {
     align-items: center;
 }
 
-/* شبكة عرض أحدث الأغراض */
 .recent-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
@@ -639,7 +633,6 @@ button.status-badge.status-red {
     margin-top: 15px;
 }
 
-/* بطاقة الغرض الفردية */
 .recent-card {
     background-color: #1a1a1a;
     border: 1px solid #333;
