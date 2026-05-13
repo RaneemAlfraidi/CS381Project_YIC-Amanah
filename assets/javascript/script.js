@@ -104,7 +104,7 @@ async function loadAdminDashboard() {
     const user = getSession();
     const [items, claims] = await Promise.all([get(`${API.foundItems}?action=getAll`), get(`${API.claims}?action=getAll`)]);
     if (items.success) {
-        const delivered = items.data.filter(i => i.status === 'delivered').length;
+        const delivered = items.data.filter(i => i.status === 'claimed').length;
         document.getElementById('delivered-count') && (document.getElementById('delivered-count').innerText = delivered);
         document.getElementById('total-found-count') && (document.getElementById('total-found-count').innerText = items.data.length);
     }
@@ -224,9 +224,15 @@ async function loadMyClaims() {
     const res = await get(`${API.claims}?action=getByStudent&student_id=${user.id}`);
     const tbody = document.querySelector('.data-table tbody');
     renderTable(tbody, res.success ? res.data : [], 4, c => `
-        <tr><td>${esc(c.item_name)}</td><td>${formatDate(c.submitted_at)}</td>
-        <td><span class="status-badge ${statusClass(c.status, 'claim')}">${statusLabel(c.status)}</span></td>
-        <td>${c.proof_details ? `<span class="status-badge status-purple view-proof-btn" data-proof="${esc(c.proof_details)}">View</span>` : '—'}</td></tr>
+        <tr>
+            <td>${esc(c.item_name)}</td>
+            <td>${formatDate(c.submitted_at)}</td>
+            <td>
+                <span class="status-badge ${statusClass(c.status, 'claim')}">${statusLabel(c.status)}</span>
+                ${c.status === 'approved' ? '<div style="font-size:0.75rem; color:#888; margin-top:4px;">📍 Please visit the YIC Amanah office to collect your item.</div>' : ''}
+            </td>
+            <td>${c.proof_details ? `<span class="status-badge status-purple view-proof-btn" data-proof="${esc(c.proof_details)}">View</span>` : '-'}</td>
+        </tr>
     `);
     attachDelegatedActions(tbody, '.view-proof-btn', e => { e.preventDefault(); showAlert(e.target.dataset.proof); });
 }
@@ -237,7 +243,10 @@ async function loadReportItem() {
     const tbody = document.querySelector('.data-table tbody');
     renderTable(tbody, res.success ? res.data : [], 5, r => `
         <tr><td>${esc(r.item_name)}</td><td>${formatDate(r.date_lost)}</td><td>${esc(r.location_lost)}</td>
-        <td><span class="status-badge ${statusClass(r.status)}">${cap(r.status)}</span></td>
+        <td>
+                <span class="status-badge ${statusClass(r.status)}">${cap(r.status)}</span>
+                ${r.status === 'found' ? '<div style="font-size:0.75rem; color:#888; margin-top:4px;">📍 Your item has been located! Please check the Amanah office.</div>' : ''}
+            </td>
         <td><a href="#" class="status-badge status-red delete-report-btn" data-id="${r.report_id}">Delete</a></td></tr>
     `);
     attachDelegatedActions(tbody, '.delete-report-btn', async (e) => {
@@ -257,7 +266,7 @@ async function loadStudentDashboard() {
         get(`${API.foundItems}?action=getAll`)
     ]);
     if (reports.success) document.getElementById('active-reports-count') && (document.getElementById('active-reports-count').innerText = reports.data.filter(r => r.status === 'pending').length);
-    if (items.success) document.getElementById('total-reunited-count') && (document.getElementById('total-reunited-count').innerText = items.data.filter(i => i.status === 'delivered').length);
+    if (claims.success) document.getElementById('total-reunited-count') && (document.getElementById('total-reunited-count').innerText = claims.data.filter(c => c.status === 'approved').length);
     if (claims.success) document.getElementById('my-claims-count') && (document.getElementById('my-claims-count').innerText = claims.data.length);
     if (items.success) document.getElementById('items-available-count') && (document.getElementById('items-available-count').innerText = items.data.filter(i => i.status === 'available').length);
 }
@@ -288,16 +297,43 @@ async function loadAllLostReports() {
 }
 
 async function loadRecentFoundItems() {
-    const grid = document.getElementById('recent-items-grid'), noMsg = document.getElementById('no-items-message');
+    const res = await get(`${API.foundItems}?action=getAll`);
+    const grid = document.getElementById('recent-items-grid');
     if (!grid) return;
-    const res = await get(`${API.foundItems}?action=getRecent`);
-    if (res.success && res.data.length) {
-        noMsg && (noMsg.style.display = 'none');
-        grid.innerHTML = res.data.map(item => `
-            <div class="recent-card"><div><h4>${esc(item.item_name)}</h4><div class="meta">${esc(item.location_found)} - ${formatDate(item.date_found)}</div></div>
-            <div class="actions"><a href="found_items.html?claim_id=${item.item_id}">Claim it</a><a href="found_items.html?detail_id=${item.item_id}">Details</a></div></div>
-        `).join('');
-    } else { noMsg && (noMsg.style.display = 'block'); grid.innerHTML = ''; }
+    const available = res.data?.filter(i => i.status === 'available').sort((a, b) => b.item_id - a.item_id).slice(0, 3) || [];
+    const noMsg = document.getElementById('no-items-message');
+
+    if (!available.length) {
+        if (noMsg) noMsg.style.display = 'block';
+        grid.innerHTML = '';
+        return;
+    }
+
+    if (noMsg) noMsg.style.display = 'none';
+    grid.innerHTML = available.map(item => `
+        <div class="item-card">
+            <div>
+                <h4>${esc(item.item_name)}</h4>
+                <p class="item-meta">${esc(item.location_found)} - ${formatDate(item.date_found)}</p>
+                ${item.description ? `<p style="color:#aaa;">${esc(item.description)}</p>` : ''}
+            </div>
+            <div class="card-actions">
+                <a href="#" class="status-badge status-purple claim-btn" data-id="${item.item_id}">Claim it</a>
+            </div>
+        </div>
+    `).join('');
+    attachDelegatedActions(grid, '.claim-btn', async (e) => {
+        e.preventDefault(); 
+        const user = getSession();
+        if (!user) { showAlert('Please log in first.'); return; }
+        showConfirm('Claim this item?', () => {
+            showPrompt('Proof of ownership:', async (proof) => {
+                const res = await post(`${API.claims}?action=create`, { student_id: user.id, item_id: e.target.dataset.id, proof_details: proof });
+                showAlert(res.message);
+                if (res.success) { loadRecentFoundItems(); updateStudentBadge(); }
+            });
+        });
+    });
 }
 
 function initStudentAuth() {
@@ -307,7 +343,7 @@ function initStudentAuth() {
     document.getElementById('show-student-login')?.addEventListener('click', e => { e.preventDefault(); signupBox.style.display='none'; loginBox.style.display='block'; });
     document.getElementById('student-login-form')?.addEventListener('submit', async (e) => {
         e.preventDefault();
-        const res = await post(`${API.users}?action=login`, { email: document.getElementById('student-email').value.trim(), password: document.getElementById('student-password').value });
+        const res = await post(`${API.users}?action=login`, { email: document.getElementById('student-email').value.trim(), password: document.getElementById('student-password').value, role: 'student' });
         if (res.success && res.user.role === 'student') {
             setSession({ email:res.user.email, name:res.user.full_name, role:'student', id:res.user.user_id });
             showAlert(`Welcome ${res.user.full_name}!`, () => location.href='Student_dashboard.html');
@@ -336,7 +372,7 @@ function initAdminAuth() {
     document.getElementById('show-admin-login')?.addEventListener('click', e => { e.preventDefault(); signupBox.style.display='none'; loginBox.style.display='block'; });
     document.getElementById('admin-login-form')?.addEventListener('submit', async (e) => {
         e.preventDefault();
-        const res = await post(`${API.users}?action=login`, { email: document.getElementById('admin-email').value.trim(), password: document.getElementById('admin-password').value });
+        const res = await post(`${API.users}?action=login`, { email: document.getElementById('admin-email').value.trim(), password: document.getElementById('admin-password').value, role: 'admin' });
         if (res.success && res.user.role === 'admin') {
             setSession({ email:res.user.email, name:res.user.full_name, role:'admin', id:res.user.user_id });
             showAlert(`Welcome ${res.user.full_name}!`, () => location.href='admin_dashboard.html');
@@ -398,6 +434,12 @@ document.addEventListener('DOMContentLoaded', () => {
         const d = new Date();
         document.getElementById('current-date-display').innerText = `${d.toLocaleDateString('en-US', { weekday:'long', month:'long', day:'numeric' })} | YIC Campus`;
     })();
+
+   const todayStr = new Date().toISOString().split('T')[0];
+    const dFound = document.getElementById('date-found');
+    if (dFound) dFound.max = todayStr;
+    const dLost = document.getElementById('date-lost');
+    if (dLost) dLost.max = todayStr;
 
     document.addEventListener('click', e => {
         let t = e.target; while(t && t !== document.body) {

@@ -199,8 +199,11 @@ function reviewClaim(int $id): void {
         $row = $getItem->fetch();
 
         if ($row) {
+            $itemId = $row['item_id'];
             $updItem = $pdo->prepare("UPDATE found_items SET status = 'claimed' WHERE item_id = :iid");
-            $updItem->execute([':iid' => $row['item_id']]);
+            $updItem->execute([':iid' => $itemId]);
+            $rejOthers = $pdo->prepare("UPDATE claims SET status = 'rejected' WHERE item_id = :iid AND claim_id != :id AND status = 'pending'");
+            $rejOthers->execute([':iid' => $itemId, ':id' => $id]);
         }
     }
 

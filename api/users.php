@@ -134,6 +134,7 @@ function registerAdmin() {
 function loginUser() {
     $email = strtolower(trim($_POST['email'] ?? ''));
     $pass = $_POST['password'] ?? '';
+    $expected_role = trim($_POST['role'] ?? ''); 
     if (!$email || !$pass) respond(false, 'Email and password required.');
 
     $pdo = getDB();
@@ -142,6 +143,11 @@ function loginUser() {
     $user = $stmt->fetch();
 
     if ($user && password_verify($pass, $user['password'])) {
+        if ($expected_role !== '' && $user['role'] !== $expected_role) {
+            respond(false, 'Access denied: Account not registered for this portal.');
+            return;
+        }
+
         $_SESSION['user_id'] = $user['user_id'];
         $_SESSION['role'] = $user['role'];
         unset($user['password']);
