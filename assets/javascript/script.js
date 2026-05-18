@@ -96,15 +96,21 @@ function renderTable(tbody, rows, columns, rowRenderer) {
 
 function attachDelegatedActions(container, selector, handler) {
     if (!container) return;
-    container.querySelectorAll(selector).forEach(btn => btn.removeEventListener('click', handler));
-    container.querySelectorAll(selector).forEach(btn => btn.addEventListener('click', handler));
+    // Use a unique key per selector to avoid stacking listeners on reload
+    const key = '_listener_' + selector.replace(/[^a-z]/gi, '_');
+    if (container[key]) container.removeEventListener('click', container[key]);
+    container[key] = (e) => {
+        const target = e.target.closest(selector);
+        if (target && container.contains(target)) handler({ ...e, target, preventDefault: () => e.preventDefault() });
+    };
+    container.addEventListener('click', container[key]);
 }
 
 async function loadAdminDashboard() {
     const user = getSession();
     const [items, claims] = await Promise.all([get(`${API.foundItems}?action=getAll`), get(`${API.claims}?action=getAll`)]);
     if (items.success) {
-        const delivered = items.data.filter(i => i.status === 'claimed').length;
+        const delivered = items.data.filter(i => i.status === 'delivered').length; // FIXED: was 'claimed'
         document.getElementById('delivered-count') && (document.getElementById('delivered-count').innerText = delivered);
         document.getElementById('total-found-count') && (document.getElementById('total-found-count').innerText = items.data.length);
     }
@@ -115,8 +121,8 @@ async function loadAdminDashboard() {
         const pendingClaims = claims.data.filter(c => c.status === 'pending').slice(0,5);
         renderTable(tbody, pendingClaims, 4, c => `
             <tr><td>${esc(c.student_name)}</td><td>${esc(c.item_name)}</td><td>${formatDate(c.submitted_at)}</td>
-            <td><div class="admin-actions"><a href="#" class="status-badge status-green approve-btn" data-id="${c.claim_id}">Approve</a>
-            <a href="#" class="status-badge status-red reject-btn" data-id="${c.claim_id}">Reject</a></div></td></tr>
+            <td><div class="admin-actions"><a href="#" class="status-badge status-green approve-btn" data-id="${c.claim_id}">Approve & Release</a>
+            <a href="#" class="status-badge status-red reject-btn" data-id="${c.claim_id}">Reject Claim</a></div></td></tr>
         `);
         attachDelegatedActions(tbody, '.approve-btn', async (e) => {
             e.preventDefault(); const id = e.target.dataset.id;
@@ -143,8 +149,8 @@ async function loadManageItems() {
     renderTable(tbody, res.success ? res.data : [], 4, item => `
         <tr><td>${esc(item.item_name)}</td><td>${esc(item.location_found)}</td>
         <td><span class="status-badge ${statusClass(item.status)}">${cap(item.status)}</span></td>
-        <td><div class="admin-actions"><a href="#" class="status-badge status-green edit-item-btn" data-id="${item.item_id}">Edit</a>
-        <a href="#" class="status-badge status-red delete-item-btn" data-id="${item.item_id}">Delete</a></div></td></tr>
+        <td><div class="admin-actions"><a href="#" class="status-badge status-green edit-item-btn" data-id="${item.item_id}">Edit Item</a>
+        <a href="#" class="status-badge status-red delete-item-btn" data-id="${item.item_id}">Delete Item</a></div></td></tr>
     `);
     attachDelegatedActions(tbody, '.delete-item-btn', async (e) => {
         e.preventDefault(); const id = e.target.dataset.id;
@@ -173,21 +179,21 @@ async function loadManageClaims() {
     const tbody = document.querySelector('.data-table tbody');
     renderTable(tbody, res.success ? res.data : [], 6, c => `
         <tr><td>${esc(c.student_name)}</td><td>${esc(c.item_name)}</td><td>${formatDate(c.submitted_at)}</td>
-        <td><a href="#" class="status-badge status-teal view-proof-btn" data-proof="${esc(c.proof_details || 'No proof')}">View</a></td>
+        <td><a href="#" class="status-badge status-teal view-proof-btn" data-proof="${esc(c.proof_details || 'No proof')}">View Proof</a></td>
         <td><span class="status-badge ${statusClass(c.status, 'claim')}">${cap(c.status)}</span></td>
-        <td>${c.status === 'pending' ? `<div class="admin-actions"><a href="#" class="status-badge status-green approve-btn" data-id="${c.claim_id}">Approve</a>
-        <a href="#" class="status-badge status-red reject-btn" data-id="${c.claim_id}">Reject</a></div>` : '<span style="color:#888;">Done</span>'}</td></tr>
+        <td>${c.status === 'pending' ? `<div class="admin-actions"><a href="#" class="status-badge status-green approve-btn" data-id="${c.claim_id}">Approve & Release</a>
+        <a href="#" class="status-badge status-red reject-btn" data-id="${c.claim_id}">Reject Claim</a></div>` : '<span style="color:#888;">Done</span>'}</td></tr>
     `);
     attachDelegatedActions(tbody, '.approve-btn', async (e) => {
         e.preventDefault(); const id = e.target.dataset.id;
-        showConfirm('Approve?', async () => {
+        showConfirm('Approve this claim?', async () => {
             const res = await post(`${API.claims}?action=review&id=${id}`, { status:'approved', reviewed_by:getSession().id });
             showAlert(res.message, loadManageClaims); updateAdminBadge(); updateStudentBadge();
         });
     });
     attachDelegatedActions(tbody, '.reject-btn', async (e) => {
         e.preventDefault(); const id = e.target.dataset.id;
-        showConfirm('Reject?', async () => {
+        showConfirm('Reject this claim?', async () => {
             const res = await post(`${API.claims}?action=review&id=${id}`, { status:'rejected', reviewed_by:getSession().id });
             showAlert(res.message, loadManageClaims); updateAdminBadge(); updateStudentBadge();
         });
@@ -204,12 +210,12 @@ async function loadFoundItems() {
     grid.innerHTML = available.map(item => `
         <div class="item-card"><div><h4>${esc(item.item_name)}</h4><p class="item-meta">${esc(item.location_found)} – ${formatDate(item.date_found)}</p>
         ${item.description ? `<p style="color:#aaa;">${esc(item.description)}</p>` : ''}</div>
-        <div class="card-actions"><a href="#" class="status-badge status-purple claim-btn" data-id="${item.item_id}">Claim it</a></div></div>
+        <div class="card-actions"><a href="#" class="status-badge status-purple claim-btn" data-id="${item.item_id}">Claim This Item</a></div></div>
     `).join('');
     attachDelegatedActions(grid, '.claim-btn', async (e) => {
         e.preventDefault(); const user = getSession();
         if (!user) { showAlert('Please log in first.'); return; }
-        showConfirm('Claim this item?', () => {
+        showConfirm('Request this item?', () => {
             showPrompt('Proof of ownership:', async (proof) => {
                 const res = await post(`${API.claims}?action=create`, { student_id:user.id, item_id:e.target.dataset.id, proof_details:proof });
                 showAlert(res.message);
@@ -231,7 +237,7 @@ async function loadMyClaims() {
                 <span class="status-badge ${statusClass(c.status, 'claim')}">${statusLabel(c.status)}</span>
                 ${c.status === 'approved' ? '<div style="font-size:0.75rem; color:#888; margin-top:4px;">📍 Please visit the YIC Amanah office to collect your item.</div>' : ''}
             </td>
-            <td>${c.proof_details ? `<span class="status-badge status-purple view-proof-btn" data-proof="${esc(c.proof_details)}">View</span>` : '-'}</td>
+            <td>${c.proof_details ? `<span class="status-badge status-purple view-proof-btn" data-proof="${esc(c.proof_details)}">View Proof Details</span>` : '-'}</td>
         </tr>
     `);
     attachDelegatedActions(tbody, '.view-proof-btn', e => { e.preventDefault(); showAlert(e.target.dataset.proof); });
@@ -247,7 +253,7 @@ async function loadReportItem() {
                 <span class="status-badge ${statusClass(r.status)}">${cap(r.status)}</span>
                 ${r.status === 'found' ? '<div style="font-size:0.75rem; color:#888; margin-top:4px;">📍 Your item has been located! Please check the Amanah office.</div>' : ''}
             </td>
-        <td><a href="#" class="status-badge status-red delete-report-btn" data-id="${r.report_id}">Delete</a></td></tr>
+        <td><a href="#" class="status-badge status-red delete-report-btn" data-id="${r.report_id}">Delete Report</a></td></tr>
     `);
     attachDelegatedActions(tbody, '.delete-report-btn', async (e) => {
         e.preventDefault(); const id = e.target.dataset.id;
@@ -277,19 +283,19 @@ async function loadAllLostReports() {
     renderTable(tbody, res.success ? res.data : [], 7, r => `
         <tr><td>${esc(r.student_name)}</td><td>${esc(r.item_name)}</td><td>${cap(r.category)}</td><td>${esc(r.location_lost)}</td>
         <td>${formatDate(r.date_lost)}</td><td><span class="status-badge ${statusClass(r.status)}">${cap(r.status)}</span></td>
-        <td>${r.status === 'pending' ? `<div class="admin-actions"><a href="#" class="status-badge status-green mark-found-btn" data-id="${r.report_id}">Mark Found</a>
-        <a href="#" class="status-badge status-red close-btn" data-id="${r.report_id}">Close</a></div>` : '—'}</td></tr>
+        <td>${r.status === 'pending' ? `<div class="admin-actions"><a href="#" class="status-badge status-green mark-found-btn" data-id="${r.report_id}">Mark as Found (Match to Item)</a>
+        <a href="#" class="status-badge status-red close-btn" data-id="${r.report_id}">Close Report (Item Not Found)</a></div>` : '—'}</td></tr>
     `);
     attachDelegatedActions(tbody, '.mark-found-btn', async (e) => {
         e.preventDefault(); const id = e.target.dataset.id;
-        showConfirm('Mark as found?', async () => {
+        showConfirm('Mark this report as found?', async () => {
             const res = await post(`${API.lostReports}?action=updateStatus&id=${id}`, { status:'found' });
             showAlert(res.message, loadAllLostReports);
         });
     });
     attachDelegatedActions(tbody, '.close-btn', async (e) => {
         e.preventDefault(); const id = e.target.dataset.id;
-        showConfirm('Close this report?', async () => {
+        showConfirm('Close this report (item not found)?', async () => {
             const res = await post(`${API.lostReports}?action=updateStatus&id=${id}`, { status:'closed' });
             showAlert(res.message, loadAllLostReports);
         });
@@ -297,10 +303,10 @@ async function loadAllLostReports() {
 }
 
 async function loadRecentFoundItems() {
-    const res = await get(`${API.foundItems}?action=getAll`);
+    const res = await get(`${API.foundItems}?action=getRecent`);
     const grid = document.getElementById('recent-items-grid');
     if (!grid) return;
-    const available = res.data?.filter(i => i.status === 'available').sort((a, b) => b.item_id - a.item_id).slice(0, 3) || [];
+    const available = res.data || [];
     const noMsg = document.getElementById('no-items-message');
 
     if (!available.length) {
@@ -318,7 +324,7 @@ async function loadRecentFoundItems() {
                 ${item.description ? `<p style="color:#aaa;">${esc(item.description)}</p>` : ''}
             </div>
             <div class="card-actions">
-                <a href="#" class="status-badge status-purple claim-btn" data-id="${item.item_id}">Claim it</a>
+                <a href="#" class="status-badge status-purple claim-btn" data-id="${item.item_id}">Claim This Item</a>
             </div>
         </div>
     `).join('');
@@ -326,7 +332,7 @@ async function loadRecentFoundItems() {
         e.preventDefault(); 
         const user = getSession();
         if (!user) { showAlert('Please log in first.'); return; }
-        showConfirm('Claim this item?', () => {
+        showConfirm('Request this item?', () => {
             showPrompt('Proof of ownership:', async (proof) => {
                 const res = await post(`${API.claims}?action=create`, { student_id: user.id, item_id: e.target.dataset.id, proof_details: proof });
                 showAlert(res.message);
@@ -351,14 +357,16 @@ function initStudentAuth() {
     });
     document.getElementById('student-signup-form')?.addEventListener('submit', async (e) => {
         e.preventDefault();
+        const email = document.getElementById('student-reg-email').value.trim();
+        const password = document.getElementById('student-reg-password').value;
         const reg = await post(`${API.users}?action=register`, {
             full_name: document.getElementById('student-fullname').value.trim(),
-            email: document.getElementById('student-reg-email').value.trim(),
-            password: document.getElementById('student-reg-password').value,
+            email: email,
+            password: password,
             confirm_password: document.getElementById('student-confirm-password').value
         });
         if (reg.success) {
-            const login = await post(`${API.users}?action=login`, { email: reg.email, password: reg.password });
+            const login = await post(`${API.users}?action=login`, { email: email, password: password, role: 'student' });
             if (login.success) setSession({ email:login.user.email, name:login.user.full_name, role:'student', id:login.user.user_id });
             showAlert('Account created!', () => location.href='Student_dashboard.html');
         } else showAlert(reg.message);
@@ -435,7 +443,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('current-date-display').innerText = `${d.toLocaleDateString('en-US', { weekday:'long', month:'long', day:'numeric' })} | YIC Campus`;
     })();
 
-   const todayStr = new Date().toISOString().split('T')[0];
+    const todayStr = new Date().toISOString().split('T')[0];
     const dFound = document.getElementById('date-found');
     if (dFound) dFound.max = todayStr;
     const dLost = document.getElementById('date-lost');
@@ -469,7 +477,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (editId) res = await post(`${API.foundItems}?action=update&id=${editId}`, data);
         else { data.posted_by = getSession().id; res = await post(`${API.foundItems}?action=create`, data); }
         if (res.success) {
-            form.reset(); delete form.dataset.editId; form.querySelector('button[type="submit"]').innerText = 'Submit';
+            form.reset(); delete form.dataset.editId; form.querySelector('button[type="submit"]').innerText = 'Save Found Item';
             showAlert(res.message, loadManageItems);
         } else showAlert(res.message);
     });

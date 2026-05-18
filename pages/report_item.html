@@ -12,12 +12,12 @@
       <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 5px;">
         <img src="../assets/media/logo.svg" alt="YIC Amanah Logo" width="200" height="150" />
       </div>
-      <p style="font-size: 0.8rem; color: #888; margin-bottom: 20px;">Campus Services</p>
+      <p style="font-size: 0.8rem; color: #888; margin-bottom: 20px;">Student Portal</p>
       <nav>
-        <a href="Student_dashboard.html">Dashboard</a>
-        <a href="report_item.html" class="active">Report Lost</a>
-        <a href="found_items.html">Found Items</a>
-        <a href="my_claims.html">My claims <span id="student-claims-badge" class="nav-badge"></span></a>
+        <a href="Student_dashboard.html">My Dashboard</a>
+        <a href="report_item.html" class="active">Report a Lost Item</a>
+        <a href="found_items.html">Browse Found Items</a>
+        <a href="my_claims.html">My Claim Requests <span id="student-claims-badge" class="nav-badge"></span></a>
       </nav>
       <div class="user-profile-menu" style="margin-top: auto; padding-top: 20px;">
         <div style="display: flex; align-items: center; gap: 12px;">
@@ -28,29 +28,29 @@
           </div>
         </div>
         <div class="dropdown-content">
-          <a href="Index.html" class="logout-btn">Logout</a>
+          <a href="Index.html" class="logout-btn">Sign Out</a>
         </div>
       </div>
     </aside>
 
     <main class="main-content">
       <header class="welcome-header">
-        <h1>Report Lost Items</h1>
-        <p style="color: #888;">Submit a report for something you lost, track its status below.</p>
+        <h1>Report a Lost Item</h1>
+        <p style="color: #888;">Lost something on campus? Fill in the details below and we'll help you track it down.</p>
       </header>
 
       <div class="form-container">
         <form id="report-item-form">
           <div class="form-group">
-            <label for="item-name">Item Name</label>
-            <input type="text" id="item-name" name="item_name" placeholder="e.g. iPhone 13 Pro" required />
+            <label for="item-name">What did you lose?</label>
+            <input type="text" id="item-name" name="item_name" placeholder="e.g. iPhone 13 Pro, Blue Backpack" required />
           </div>
           <div class="form-group">
-            <label for="date-lost">Date Lost</label>
+            <label for="date-lost">When did you lose it?</label>
             <input type="date" id="date-lost" name="date_lost" required />
           </div>
           <div class="form-group">
-            <label for="category">Category</label>
+            <label for="category">Item Category</label>
             <select id="category" name="category">
               <option value="electronics">Electronics</option>
               <option value="personal">Personal Items</option>
@@ -59,40 +59,40 @@
             </select>
           </div>
           <div class="form-group">
-            <label for="location">Location Last Seen</label>
-            <input type="text" id="location" name="location" placeholder="e.g. Library, Floor 2" required />
+            <label for="location">Where did you last have it?</label>
+            <input type="text" id="location" name="location" placeholder="e.g. Library Floor 2, Cafeteria" required />
           </div>
           <div class="form-group">
-            <label for="description">Description</label>
-            <textarea id="description" name="description" rows="4" placeholder="Describe colors, marks, or specific details..."></textarea>
+            <label for="description">Describe it so we can identify it</label>
+            <textarea id="description" name="description" rows="4" placeholder="Mention colors, brand, any unique marks or stickers..."></textarea>
           </div>
           <div class="action-buttons">
-            <button type="submit" class="btn-student">Submit Report</button>
-            <button type="reset" class="btn-cancel">Cancel</button>
+            <button type="submit" class="btn-student">Submit My Lost Item Report</button>
+            <button type="reset" class="btn-cancel">Clear Form</button>
           </div>
         </form>
       </div>
 
       <section style="margin-top: 40px;">
-        <h3 style="color: #e0e0e0;">My Past Reports</h3>
+        <h3 style="color: #e0e0e0;">My Previous Reports</h3>
         <table class="data-table">
           <thead>
-            <tr><th>Item</th><th>Date</th><th>Location</th><th>Status</th><th>Action</th></tr>
+            <tr><th>Item</th><th>Date Reported</th><th>Last Seen At</th><th>Status</th><th>Action</th></tr>
           </thead>
           <tbody>
             <tr>
               <td data-label="Item">iPhone 13 Pro</td>
-              <td data-label="Date">April 3</td>
-              <td data-label="Location">Cafeteria</td>
+              <td data-label="Date Reported">April 3</td>
+              <td data-label="Last Seen At">Cafeteria</td>
               <td data-label="Status"><span class="status-badge status-under-review">Pending</span></td>
-              <td data-label="Action"><a href="#" class="status-badge status-purple">View</a></td>
+              <td data-label="Action"><a href="#" class="status-badge status-purple">View Details</a></td>
             </tr>
             <tr>
               <td data-label="Item">Blue Bag</td>
-              <td data-label="Date">March 21</td>
-              <td data-label="Location">Building B</td>
+              <td data-label="Date Reported">March 21</td>
+              <td data-label="Last Seen At">Building B</td>
               <td data-label="Status"><span class="status-badge status-approved">Found</span></td>
-              <td data-label="Action"><a href="#" class="status-badge status-purple">View</a></td>
+              <td data-label="Action"><a href="#" class="status-badge status-purple">View Details</a></td>
             </tr>
           </tbody>
         </table>

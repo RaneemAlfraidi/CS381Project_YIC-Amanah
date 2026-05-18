@@ -14,10 +14,10 @@
             </div>
             <p style="font-size:0.8rem; color:#888; margin-bottom:20px;">Admin Workspace</p>
             <nav>
-                <a href="admin_dashboard.html" class="active">Dashboard</a>
-                <a href="manage_items.html">Manage Items</a>
-                <a href="manage_claims.html">Claims requests <span id="admin-claims-badge" class="nav-badge"></span></a>
-                <a href="manage_lost_reports.html">Lost Reports</a>
+                <a href="admin_dashboard.html" class="active">Admin Dashboard</a>
+                <a href="manage_items.html">Post & Manage Found Items</a>
+                <a href="manage_claims.html">Review Claim Requests <span id="admin-claims-badge" class="nav-badge"></span></a>
+                <a href="manage_lost_reports.html">View Student Lost Reports</a>
             </nav>
             <div class="user-profile-menu" style="margin-top:auto; padding-top:20px;">
                 <div style="display:flex; align-items:center; gap:12px;">
@@ -28,7 +28,7 @@
                     </div>
                 </div>
                 <div class="dropdown-content">
-                    <a href="Index.html" class="logout-btn">Logout</a>
+                    <a href="Index.html" class="logout-btn">Sign Out</a>
                 </div>
             </div>
         </aside>
@@ -41,38 +41,38 @@
 
             <section class="stats-grid">
                 <div class="stat-card">
-                    <h3>Delivered Items</h3>
+                    <h3>Items Returned</h3>
                     <p id="delivered-count">0</p>
                 </div>
                 <div class="stat-card">
-                    <h3>Total Found</h3>
+                    <h3>Total Items Posted</h3>
                     <p id="total-found-count">0</p>
                 </div>
                 <div class="stat-card">
-                    <h3>Pending Claims</h3>
+                    <h3>Claims Awaiting Review</h3>
                     <p id="pending-claims-count">0</p>
                 </div>
             </section>
 
             <div class="action-buttons">
-                <a href="manage_items.html" class="btn-admin-primary">Post Found Items</a>
-                <a href="manage_claims.html" class="btn-admin-primary">Review Claims</a>
+                <a href="manage_items.html" class="btn-admin-primary">Post a New Found Item</a>
+                <a href="manage_claims.html" class="btn-admin-primary">Review Pending Claims</a>
                 <button id="generate-invite-btn" class="btn-admin-primary" title="Generate a one-time invite token to register a new admin">
-                    &#128273; Generate Admin Invite
+                    &#128273; Invite a New Admin
                 </button>
             </div>
 
             <section style="margin-top:30px;">
-                <h3>Recent Pending Claims</h3>
+                <h3>Claims Waiting for Your Review</h3>
                 <table class="data-table admin-table">
                     <thead>
-                        <tr><th>Student</th><th>Item</th><th>Date</th><th>Action</th></tr>
+                        <tr><th>Student</th><th>Item Claimed</th><th>Submitted On</th><th>Action</th></tr>
                     </thead>
                     <tbody></tbody>
                 </table>
             </section>
         </main>
     </div>
-    <script src="../assets/javascript/script.js">z</script>
+    <script src="../assets/javascript/script.js"></script>
 </body>
 </html>

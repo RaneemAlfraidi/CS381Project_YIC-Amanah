@@ -14,10 +14,10 @@
             </div>
             <p style="font-size: 0.8rem; color: #888; margin-bottom: 20px;">Admin Workspace</p>
             <nav>
-                <a href="admin_dashboard.html">Dashboard</a>
-                <a href="manage_items.html">Manage Items</a>
-                <a href="manage_claims.html">Claims requests <span id="admin-claims-badge" class="nav-badge"></span></a>
-                <a href="manage_lost_reports.html" class="active">Lost Reports</a>
+                <a href="admin_dashboard.html">Admin Dashboard</a>
+                <a href="manage_items.html">Post & Manage Found Items</a>
+                <a href="manage_claims.html">Review Claim Requests <span id="admin-claims-badge" class="nav-badge"></span></a>
+                <a href="manage_lost_reports.html" class="active">View Student Lost Reports</a>
             </nav>
             <div class="user-profile-menu" style="margin-top: auto; padding-top: 20px;">
                 <div style="display: flex; align-items: center; gap: 12px;">
@@ -28,7 +28,7 @@
                     </div>
                 </div>
                 <div class="dropdown-content">
-                    <a href="Index.html" class="logout-btn">Logout</a>
+                    <a href="Index.html" class="logout-btn">Sign Out</a>
                 </div>
             </div>
         </aside>
@@ -36,16 +36,16 @@
         <main class="main-content">
             <header class="welcome-header">
                 <h1>Student Lost Reports</h1>
-                <p style="color: #888;">View and update status of lost item reports.</p>
+                <p style="color: #888;">Browse all lost item reports submitted by students. Mark a report as found when a matching item has been located.</p>
             </header>
             <section>
                 <h3>All Lost Reports</h3>
                 <div class="search-container" style="margin-top: 10px;">
-                    <input type="text" class="search-bar" placeholder="Search by item or student...">
+                    <input type="text" class="search-bar" placeholder="Search by student name or item…">
                 </div>
                 <table class="data-table admin-table">
                     <thead>
-                        <tr><th>Student</th><th>Item</th><th>Category</th><th>Location</th><th>Date Lost</th><th>Status</th><th>Action</th></tr>
+                        <tr><th>Student</th><th>Item Lost</th><th>Category</th><th>Last Seen At</th><th>Date Lost</th><th>Status</th><th>Action</th></tr>
                     </thead>
                     <tbody id="lost-reports-tbody">
                         <tr><td colspan="7" style="text-align:center;">Loading...</td></tr>

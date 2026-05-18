@@ -1,31 +1,26 @@
-yic_amanahyic_amanah
+DROP DATABASE IF EXISTS yic_amanah;
+
 CREATE DATABASE IF NOT EXISTS yic_amanah;
 USE yic_amanah;
-
 
 CREATE TABLE users (
     user_id     INT AUTO_INCREMENT PRIMARY KEY,
     full_name   VARCHAR(100) NOT NULL,
     email       VARCHAR(150) NOT NULL UNIQUE,
-    password    VARCHAR(255) NOT NULL,          
+    password    VARCHAR(255) NOT NULL,
     role        ENUM('student', 'admin') NOT NULL DEFAULT 'student',
     created_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-INSERT INTO users (full_name, email, password, role) VALUES
-('Khadijah Mahrous',   'y4f441500093@rcjy.edu.sa', '$2y$10$hashedpw1', 'admin'),
-('Raneem Alfraidi',    'y4f441500506@rcjy.edu.sa', '$2y$10$hashedpw2', 'admin'),
-('Sarah Al-Otaibi',    'sarah.otaibi@rcjy.edu.sa',  '$2y$10$hashedpw3', 'student'),
-('Norah Al-Qahtani',   'norah.qahtani@rcjy.edu.sa', '$2y$10$hashedpw4', 'student'),
-('Amal Al-Zahrani',    'amal.zahrani@rcjy.edu.sa',  '$2y$10$hashedpw5', 'student'),
-('Hessa Al-Shehri',    'hessa.shehri@rcjy.edu.sa',  '$2y$10$hashedpw6', 'student'),
-('Maha Al-Dossari',    'maha.dossari@rcjy.edu.sa',  '$2y$10$hashedpw7', 'student'),
-('Lina Al-Harbi',      'lina.harbi@rcjy.edu.sa',    '$2y$10$hashedpw8', 'student'),
-('Dalal Al-Mutairi',   'dalal.mutairi@rcjy.edu.sa', '$2y$10$hashedpw9', 'student'),
-('Reem Al-Ghamdi',     'reem.ghamdi@rcjy.edu.sa',   '$2y$10$hashedpw10','student'),
-('Wafa Al-Sayed',      'wafa.sayed@rcjy.edu.sa',    '$2y$10$hashedpw11','student'),
-('Jana Al-Rashidi',    'jana.rashidi@rcjy.edu.sa',  '$2y$10$hashedpw12','student');
-
+CREATE TABLE admin_invites (
+    token      CHAR(64)  PRIMARY KEY,
+    created_by INT       NOT NULL,
+    used_by    INT       DEFAULT NULL,
+    expires_at DATETIME  NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (created_by) REFERENCES users(user_id) ON DELETE CASCADE,
+    FOREIGN KEY (used_by)    REFERENCES users(user_id) ON DELETE SET NULL
+);
 
 CREATE TABLE found_items (
     item_id         INT AUTO_INCREMENT PRIMARY KEY,
@@ -35,10 +30,52 @@ CREATE TABLE found_items (
     location_found  VARCHAR(200) NOT NULL,
     date_found      DATE NOT NULL,
     status          ENUM('available', 'claimed', 'delivered') NOT NULL DEFAULT 'available',
-    posted_by       INT NOT NULL,               
+    posted_by       INT NOT NULL,
     created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (posted_by) REFERENCES users(user_id)
+    FOREIGN KEY (posted_by) REFERENCES users(user_id) ON DELETE CASCADE
 );
+
+CREATE TABLE lost_reports (
+    report_id       INT AUTO_INCREMENT PRIMARY KEY,
+    student_id      INT NOT NULL,
+    item_name       VARCHAR(150) NOT NULL,
+    category        ENUM('electronics', 'personal', 'books', 'accessories', 'other') NOT NULL,
+    description     TEXT,
+    location_lost   VARCHAR(200) NOT NULL,
+    date_lost       DATE NOT NULL,
+    status          ENUM('pending', 'found', 'closed') NOT NULL DEFAULT 'pending',
+    created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (student_id) REFERENCES users(user_id) ON DELETE CASCADE
+);
+
+CREATE TABLE claims (
+    claim_id        INT AUTO_INCREMENT PRIMARY KEY,
+    student_id      INT NOT NULL,
+    item_id         INT NOT NULL,
+    proof_details   TEXT,
+    status          ENUM('pending', 'approved', 'rejected') NOT NULL DEFAULT 'pending',
+    reviewed_by     INT,
+    reviewed_at     TIMESTAMP NULL,
+    submitted_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (student_id) REFERENCES users(user_id) ON DELETE CASCADE,
+    FOREIGN KEY (item_id)    REFERENCES found_items(item_id) ON DELETE CASCADE,
+    FOREIGN KEY (reviewed_by) REFERENCES users(user_id) ON DELETE SET NULL,
+    UNIQUE KEY uq_student_item (student_id, item_id)
+);
+
+INSERT INTO users (full_name, email, password, role) VALUES
+('Khadijah Mahrous',   'y4f441500093@rcjy.edu.sa', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'admin'),
+('Raneem Alfraidi',    'y4f441500506@rcjy.edu.sa', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'admin'),
+('Sarah Al-Otaibi',    'sarah.otaibi@rcjy.edu.sa',  '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'student'),
+('Norah Al-Qahtani',   'norah.qahtani@rcjy.edu.sa', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'student'),
+('Amal Al-Zahrani',    'amal.zahrani@rcjy.edu.sa',  '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'student'),
+('Hessa Al-Shehri',    'hessa.shehri@rcjy.edu.sa',  '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'student'),
+('Maha Al-Dossari',    'maha.dossari@rcjy.edu.sa',  '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'student'),
+('Lina Al-Harbi',      'lina.harbi@rcjy.edu.sa',    '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'student'),
+('Dalal Al-Mutairi',   'dalal.mutairi@rcjy.edu.sa', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'student'),
+('Reem Al-Ghamdi',     'reem.ghamdi@rcjy.edu.sa',   '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'student'),
+('Wafa Al-Sayed',      'wafa.sayed@rcjy.edu.sa',    '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'student'),
+('Jana Al-Rashidi',    'jana.rashidi@rcjy.edu.sa',  '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'student');
 
 INSERT INTO found_items (item_name, category, description, location_found, date_found, status, posted_by) VALUES
 ('iPhone 13 Pro',       'electronics', 'Black iPhone 13 Pro with a cracked screen protector, no case',         'Cafeteria',          '2026-04-03', 'available',  1),
@@ -54,20 +91,6 @@ INSERT INTO found_items (item_name, category, description, location_found, date_
 ('Makeup Pouch',        'personal',    'Small floral-print fabric pouch containing makeup items',               'Restroom – Bldg A',  '2026-04-02', 'available',  2),
 ('USB Flash Drive',     'electronics', '32GB SanDisk flash drive, red color, has academic files',               'Computer Lab 1',     '2026-03-25', 'available',  1);
 
-
-CREATE TABLE lost_reports (
-    report_id       INT AUTO_INCREMENT PRIMARY KEY,
-    student_id      INT NOT NULL,               
-    item_name       VARCHAR(150) NOT NULL,
-    category        ENUM('electronics', 'personal', 'books', 'accessories', 'other') NOT NULL,
-    description     TEXT,
-    location_lost   VARCHAR(200) NOT NULL,
-    date_lost       DATE NOT NULL,
-    status          ENUM('pending', 'found', 'closed') NOT NULL DEFAULT 'pending',
-    created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (student_id) REFERENCES users(user_id)
-);
-
 INSERT INTO lost_reports (student_id, item_name, category, description, location_lost, date_lost, status) VALUES
 (3,  'iPhone 13 Pro',       'electronics', 'Black iPhone 13 Pro, cracked screen protector',         'Cafeteria',         '2026-04-03', 'found'),
 (4,  'Blue Backpack',       'personal',    'Navy blue Adidas backpack, has my name tag inside',      'Building B',        '2026-03-31', 'found'),
@@ -81,19 +104,6 @@ INSERT INTO lost_reports (student_id, item_name, category, description, location
 (12, 'Wallet',              'personal',    'Brown leather wallet, contains ID and bank card',        'Cafeteria',         '2026-04-06', 'pending'),
 (3,  'Airpods Pro',         'electronics', 'White AirPods Pro, case has a small scratch on lid',    'Cafeteria',         '2026-04-05', 'found'),
 (5,  'Physics Textbook',    'books',       'University Physics 14th edition, highlighted pages',     'Library',           '2026-02-20', 'closed');
-
-CREATE TABLE claims (
-    claim_id        INT AUTO_INCREMENT PRIMARY KEY,
-    student_id      INT NOT NULL,
-    item_id         INT NOT NULL,
-    status          ENUM('pending', 'approved', 'rejected') NOT NULL DEFAULT 'pending',
-    reviewed_by     INT,                        
-    reviewed_at     TIMESTAMP NULL,
-    submitted_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (student_id) REFERENCES users(user_id),
-    FOREIGN KEY (item_id)    REFERENCES found_items(item_id),
-    FOREIGN KEY (reviewed_by) REFERENCES users(user_id)
-);
 
 INSERT INTO claims (student_id, item_id, proof_details, status, reviewed_by, reviewed_at) VALUES
 (3,  1,  'It is my phone. My wallpaper is a photo of my family. Serial number starts with F2VWQ.', 'pending',  NULL, NULL),

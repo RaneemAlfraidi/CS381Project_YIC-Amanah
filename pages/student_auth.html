@@ -14,23 +14,23 @@
     <div class="auth-container" id="student-login-box">
         <div class="auth-header">
             <img src="../assets/media/logo.svg" alt="YIC Amanah Logo" width="200" height="150">
-            <h2>Student Log in</h2>
+            <h2>Welcome Back</h2>
         </div>
         <form id="student-login-form">
             <div class="form-group">
-                <label for="student-email">Email:</label>
-                <input type="email" id="student-email" required>
+                <label for="student-email">Your Email:</label>
+                <input type="email" id="student-email" required placeholder="e.g. name@rcjy.edu.sa">
             </div>
             <div class="form-group">
-                <label for="student-password">Password:</label>
-                <input type="password" id="student-password" required>
+                <label for="student-password">Your Password:</label>
+                <input type="password" id="student-password" required placeholder="Enter your password">
             </div>
             <div class="center-btn-wrapper">
-                <button type="submit" class="btn-auth">Log in as Student</button>
+                <button type="submit" class="btn-auth">Sign In to My Account</button>
             </div>
         </form>
         <div class="switch-auth">
-            Don't have a student account? <a href="#" id="show-student-signup">Register here</a>
+            New to Amanah? <a href="#" id="show-student-signup">Create a free account</a>
         </div>
     </div>
 
@@ -38,34 +38,33 @@
     <div class="auth-container" id="student-signup-box" style="display: none;">
         <div class="auth-header">
             <img src="../assets/media/logo.svg" alt="YIC Amanah Logo" width="200" height="150">
-            <h2>Create Student Account</h2>
+            <h2>Create Your Student Account</h2>
         </div>
         <form id="student-signup-form">
             <div class="form-group">
                 <label for="student-fullname">Full Name:</label>
-                <input type="text" id="student-fullname" required>
+                <input type="text" id="student-fullname" required placeholder="e.g. Sarah Al-Otaibi">
             </div>
             <div class="form-group">
-                <label for="student-reg-email">Email:</label>
-                <input type="email" id="student-reg-email" required>
+                <label for="student-reg-email">Email Address:</label>
+                <input type="email" id="student-reg-email" required placeholder="e.g. name@rcjy.edu.sa">
             </div>
             <div class="form-group">
-                <label for="student-reg-password">Password:</label>
-                <input type="password" id="student-reg-password" required>
+                <label for="student-reg-password">Choose a Password:</label>
+                <input type="password" id="student-reg-password" required placeholder="At least 6 characters with letters & numbers">
             </div>
             <div class="form-group">
                 <label for="student-confirm-password">Confirm Password:</label>
-                <input type="password" id="student-confirm-password" required>
+                <input type="password" id="student-confirm-password" required placeholder="Re-enter your password">
             </div>
             <div class="center-btn-wrapper">
-                <button type="submit" class="btn-auth">Sign Up</button>
+                <button type="submit" class="btn-auth">Create My Account</button>
             </div>
         </form>
         <div class="switch-auth">
-            Already have an account? <a href="#" id="show-student-login">Login here</a>
+            Already have an account? <a href="#" id="show-student-login">Sign in here</a>
         </div>
     </div>
-    
 
     <script src="../assets/javascript/script.js"></script>
 </body>

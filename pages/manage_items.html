@@ -13,12 +13,12 @@
         <img src="../assets/media/logo.svg" alt="YIC Amanah Logo" width="200" height="150" />
       </div>
       <p style="font-size: 0.8rem; color: #888; margin-bottom: 20px;">Admin Workspace</p>
-    <nav>
-    <a href="admin_dashboard.html">Dashboard</a>
-    <a href="manage_items.html" class="active">Manage Items</a>
-    <a href="manage_claims.html">Claims requests <span id="admin-claims-badge" class="nav-badge"></span></a>
-    <a href="manage_lost_reports.html">Lost Reports</a>
-</nav>
+      <nav>
+        <a href="admin_dashboard.html">Admin Dashboard</a>
+        <a href="manage_items.html" class="active">Post & Manage Found Items</a>
+        <a href="manage_claims.html">Review Claim Requests <span id="admin-claims-badge" class="nav-badge"></span></a>
+        <a href="manage_lost_reports.html">View Student Lost Reports</a>
+      </nav>
       <div class="user-profile-menu" style="margin-top: auto; padding-top: 20px;">
         <div style="display: flex; align-items: center; gap: 12px;">
           <div class="user-avatar">KM</div>
@@ -28,29 +28,29 @@
           </div>
         </div>
         <div class="dropdown-content">
-          <a href="Index.html" class="logout-btn">Logout</a>
+          <a href="Index.html" class="logout-btn">Sign Out</a>
         </div>
       </div>
     </aside>
 
     <main class="main-content">
       <header class="welcome-header">
-        <h1>Post Found Items</h1>
-        <p style="color: #888;">Register newly found items and manage the existing records below.</p>
+        <h1>Post a Found Item</h1>
+        <p style="color: #888;">Found something on campus? Add it here so students can identify and claim it.</p>
       </header>
 
       <div class="form-container admin-form-container">
         <form id="add-item-form">
           <div class="form-group">
-            <label for="item-name">Item Name</label>
-            <input type="text" id="item-name" name="item_name" placeholder="e.g. iPhone 13 Pro" required />
+            <label for="item-name">What was found?</label>
+            <input type="text" id="item-name" name="item_name" placeholder="e.g. iPhone 13 Pro, Blue Backpack" required />
           </div>
           <div class="form-group">
-            <label for="date-found">Date Found</label>
+            <label for="date-found">Date it was found</label>
             <input type="date" id="date-found" name="date_found" required />
           </div>
           <div class="form-group">
-            <label for="category">Category</label>
+            <label for="category">Item Category</label>
             <select id="category" name="category">
               <option value="electronics">Electronics</option>
               <option value="personal">Personal Items</option>
@@ -58,49 +58,49 @@
             </select>
           </div>
           <div class="form-group">
-            <label for="location">Location Found</label>
-            <input type="text" id="location" name="location" placeholder="e.g. Library, Floor 2" required />
+            <label for="location">Where was it found?</label>
+            <input type="text" id="location" name="location" placeholder="e.g. Library Floor 2, Cafeteria" required />
           </div>
           <div class="form-group">
-            <label for="description">Description</label>
-            <textarea id="description" name="description" rows="4" placeholder="Describe colors, marks, or specific details..."></textarea>
+            <label for="description">Description (helps the owner identify it)</label>
+            <textarea id="description" name="description" rows="4" placeholder="Describe colors, brand, unique marks, stickers, etc."></textarea>
           </div>
           <div class="action-buttons">
-            <button type="submit" class="btn-admin-primary">Submit</button>
-            <button type="reset" class="btn-cancel">Cancel</button>
+            <button type="submit" class="btn-admin-primary">Save & Publish Item</button>
+            <button type="reset" class="btn-cancel">Clear Form</button>
           </div>
         </form>
       </div>
 
       <section style="margin-top: 40px;">
-        <h3>Manage Found Items</h3>
+        <h3>All Posted Items</h3>
         <div class="search-container" style="margin-top: 10px;">
-          <input type="text" class="search-bar admin-search-bar" placeholder="Search items..." />
+          <input type="text" class="search-bar admin-search-bar" placeholder="Search by item name or location…" />
         </div>
         <table class="data-table admin-table">
           <thead>
-            <tr><th>Item</th><th>Location</th><th>Status</th><th>Action</th></tr>
+            <tr><th>Item</th><th>Location Found</th><th>Status</th><th>Actions</th></tr>
           </thead>
           <tbody>
             <tr>
               <td data-label="Item">iPhone 13 Pro</td>
-              <td data-label="Location">Cafeteria</td>
+              <td data-label="Location Found">Cafeteria</td>
               <td data-label="Status">-</td>
-              <td data-label="Action">
+              <td data-label="Actions">
                 <div class="admin-actions">
-                  <a href="#" class="status-badge status-green">Edit</a>
-                  <a href="#" class="status-badge status-red">Delete</a>
+                  <a href="#" class="status-badge status-green">Edit Details</a>
+                  <a href="#" class="status-badge status-red">Remove Item</a>
                 </div>
               </td>
             </tr>
             <tr>
               <td data-label="Item">Blue Bag</td>
-              <td data-label="Location">Building B</td>
+              <td data-label="Location Found">Building B</td>
               <td data-label="Status">-</td>
-              <td data-label="Action">
+              <td data-label="Actions">
                 <div class="admin-actions">
-                  <a href="#" class="status-badge status-green">Edit</a>
-                  <a href="#" class="status-badge status-red">Delete</a>
+                  <a href="#" class="status-badge status-green">Edit Details</a>
+                  <a href="#" class="status-badge status-red">Remove Item</a>
                 </div>
               </td>
             </tr>

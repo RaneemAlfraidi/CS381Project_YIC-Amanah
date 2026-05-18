@@ -9,17 +9,16 @@
 
 <body>
   <div class="dashboard-container">
-    <!-- Sidebar -->
     <aside class="sidebar student">
       <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 5px;">
         <img src="../assets/media/logo.svg" alt="YIC Amanah Logo" width="200" height="150" />
       </div>
-      <p style="font-size: 0.8rem; color: #888; margin-bottom: 20px;">Campus Services</p>
+      <p style="font-size: 0.8rem; color: #888; margin-bottom: 20px;">Student Portal</p>
       <nav>
-        <a href="Student_dashboard.html" class="active">Dashboard</a>
-        <a href="report_item.html">Report Lost</a>
-        <a href="found_items.html">Found Items</a>
-        <a href="my_claims.html">My claims <span id="student-claims-badge" class="nav-badge"></span></a>
+        <a href="Student_dashboard.html" class="active">My Dashboard</a>
+        <a href="report_item.html">Report a Lost Item</a>
+        <a href="found_items.html">Browse Found Items</a>
+        <a href="my_claims.html">My Claim Requests <span id="student-claims-badge" class="nav-badge"></span></a>
       </nav>
       <div class="user-profile-menu" style="margin-top: auto; padding-top: 20px;">
         <div style="display: flex; align-items: center; gap: 12px;">
@@ -30,7 +29,7 @@
           </div>
         </div>
         <div class="dropdown-content">
-          <a href="Index.html" class="logout-btn">Logout</a>
+          <a href="Index.html" class="logout-btn">Sign Out</a>
         </div>
       </div>
     </aside>
@@ -43,11 +42,11 @@
 
       <section class="stats-grid">
         <div class="stat-card">
-          <h3>Active Reports</h3>
+          <h3>Open Reports</h3>
           <p id="active-reports-count">0</p>
         </div>
         <div class="stat-card">
-          <h3>Total Reunited</h3>
+          <h3>Items Recovered</h3>
           <p id="total-reunited-count">0</p>
         </div>
         <div class="stat-card">
@@ -55,14 +54,14 @@
           <p id="my-claims-count">0</p>
         </div>
         <div class="stat-card">
-          <h3>Items Available</h3>
+          <h3>Unclaimed Items</h3>
           <p id="items-available-count">0</p>
         </div>
       </section>
 
       <div class="action-buttons">
-        <a href="report_item.html" class="btn-student">Report Lost Items</a>
-        <a href="my_claims.html" class="btn-student">View My Claims</a>
+        <a href="report_item.html" class="btn-student">Report Something Lost</a>
+        <a href="my_claims.html" class="btn-student">Check My Claim Status</a>
         <a href="found_items.html" class="btn-student">Browse Found Items</a>
       </div>
 
@@ -70,7 +69,7 @@
         <h3>Recently Found on Campus</h3>
         <div id="recent-items-grid" class="recent-grid"></div>
         <p id="no-items-message" style="color: #888; margin-top: 10px;">
-           New items will appear here after admin approval.
+          No items available right now — check back soon.
         </p>
       </section>
     </main>

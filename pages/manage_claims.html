@@ -14,10 +14,10 @@
             </div>
             <p style="font-size: 0.8rem; color: #888; margin-bottom: 20px;">Admin Workspace</p>
             <nav>
-                <a href="admin_dashboard.html">Dashboard</a>
-                <a href="manage_items.html">Manage Items</a>
-                <a href="manage_claims.html" class="active">Claims requests <span id="admin-claims-badge" class="nav-badge"></span></a>
-                <a href="manage_lost_reports.html">Lost Reports</a>
+                <a href="admin_dashboard.html">Admin Dashboard</a>
+                <a href="manage_items.html">Post & Manage Found Items</a>
+                <a href="manage_claims.html" class="active">Review Claim Requests <span id="admin-claims-badge" class="nav-badge"></span></a>
+                <a href="manage_lost_reports.html">View Student Lost Reports</a>
             </nav>
             <div class="user-profile-menu" style="margin-top: auto; padding-top: 20px;">
                 <div style="display: flex; align-items: center; gap: 12px;">
@@ -28,25 +28,25 @@
                     </div>
                 </div>
                 <div class="dropdown-content">
-                    <a href="Index.html" class="logout-btn">Logout</a>
+                    <a href="Index.html" class="logout-btn">Sign Out</a>
                 </div>
             </div>
         </aside>
 
         <main class="main-content">
             <header class="welcome-header">
-                <h1>Claims Requests</h1>
-                <p style="color: #888;">Review and manage item claims submitted by students.</p>
+                <h1>Student Claim Requests</h1>
+                <p style="color: #888;">Review proof of ownership submitted by students and approve or reject each claim.</p>
             </header>
             <section>
-                <h3>All Claims</h3>
+                <h3>All Submitted Claims</h3>
                 <div class="search-container" style="margin-top: 10px;">
-                    <input type="text" class="search-bar" placeholder="Search Bar">
+                    <input type="text" class="search-bar" placeholder="Search by student name or item…">
                 </div>
                 <table class="data-table admin-table">
                     <thead>
                         <tr>
-                            <th>Student</th><th>Item</th><th>Date</th><th>Proof</th><th>Status</th><th>Action</th>
+                            <th>Student</th><th>Item Claimed</th><th>Submitted On</th><th>Proof Provided</th><th>Status</th><th>Decision</th>
                         </tr>
                     </thead>
                     <tbody>

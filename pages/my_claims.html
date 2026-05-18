@@ -12,12 +12,12 @@
       <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 5px;">
         <img src="../assets/media/logo.svg" alt="YIC Amanah Logo" width="200" height="150" />
       </div>
-      <p style="font-size: 0.8rem; color: #888; margin-bottom: 20px;">Campus Services</p>
+      <p style="font-size: 0.8rem; color: #888; margin-bottom: 20px;">Student Portal</p>
       <nav>
-        <a href="Student_dashboard.html">Dashboard</a>
-        <a href="report_item.html">Report Lost</a>
-        <a href="found_items.html">Found Items</a>
-       <a href="my_claims.html" class="active">My claims <span id="student-claims-badge" class="nav-badge"></span></a>
+        <a href="Student_dashboard.html">My Dashboard</a>
+        <a href="report_item.html">Report a Lost Item</a>
+        <a href="found_items.html">Browse Found Items</a>
+        <a href="my_claims.html" class="active">My Claim Requests <span id="student-claims-badge" class="nav-badge"></span></a>
       </nav>
       <div class="user-profile-menu" style="margin-top: auto; padding-top: 20px;">
         <div style="display: flex; align-items: center; gap: 12px;">
@@ -28,7 +28,7 @@
           </div>
         </div>
         <div class="dropdown-content">
-          <a href="Index.html" class="logout-btn">Logout</a>
+          <a href="Index.html" class="logout-btn">Sign Out</a>
         </div>
       </div>
     </aside>
@@ -36,33 +36,33 @@
     <main class="main-content">
       <header class="welcome-header">
         <h1>My Claim Requests</h1>
-        <p style="color: #888;">Track the status of items you have claimed.</p>
+        <p style="color: #888;">Track the review status of items you've claimed. Approved? Visit the Amanah office to collect your item.</p>
       </header>
 
       <section>
-        <h3>Your Claims</h3>
+        <h3>All My Claims</h3>
         <table class="data-table">
           <thead>
-            <tr><th>Item</th><th>Date Claimed</th><th>Status</th><th>Details</th></tr>
+            <tr><th>Item</th><th>Claimed On</th><th>Review Status</th><th>My Proof</th></tr>
           </thead>
           <tbody>
             <tr>
               <td data-label="Item">iPhone 13 Pro</td>
-              <td data-label="Date Claimed">April 4, 2026</td>
-              <td data-label="Status"><span class="status-badge status-under-review">Pending Review</span></td>
-              <td data-label="Details"><a href="#" class="status-badge status-purple">View</a></td>
+              <td data-label="Claimed On">April 4, 2026</td>
+              <td data-label="Review Status"><span class="status-badge status-under-review">Pending Review</span></td>
+              <td data-label="My Proof"><a href="#" class="status-badge status-purple">View My Proof</a></td>
             </tr>
             <tr>
               <td data-label="Item">Blue Backpack</td>
-              <td data-label="Date Claimed">March 22, 2026</td>
-              <td data-label="Status"><span class="status-badge status-approved">Approved</span></td>
-              <td data-label="Details"><a href="#" class="status-badge status-purple">View</a></td>
+              <td data-label="Claimed On">March 22, 2026</td>
+              <td data-label="Review Status"><span class="status-badge status-approved">Approved — Ready for Pickup</span></td>
+              <td data-label="My Proof"><a href="#" class="status-badge status-purple">View My Proof</a></td>
             </tr>
             <tr>
               <td data-label="Item">Car Keys</td>
-              <td data-label="Date Claimed">Feb 18, 2026</td>
-              <td data-label="Status"><span class="status-badge status-red" style="pointer-events: none;">Rejected</span></td>
-              <td data-label="Details"><a href="#" class="status-badge status-purple">View</a></td>
+              <td data-label="Claimed On">Feb 18, 2026</td>
+              <td data-label="Review Status"><span class="status-badge status-red" style="pointer-events: none;">Rejected</span></td>
+              <td data-label="My Proof"><a href="#" class="status-badge status-purple">View My Proof</a></td>
             </tr>
           </tbody>
         </table>
